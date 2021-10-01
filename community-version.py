@@ -43,7 +43,7 @@ def convert_image_to_ascii(image, new_width=100):
     return "\n".join(image_ascii)
 
 def txtfile(txt):
-    with open("Output.txt", "w") as text_file:
+    with open("output.txt", "w") as text_file:
         text_file.write("%s" % txt)
 
 
