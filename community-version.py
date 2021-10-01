@@ -2,6 +2,7 @@
 
 #code credit goes to: https://www.hackerearth.com/practice/notes/beautiful-python-a-simple-ascii-art-generator-from-images/
 #code modified to work with Python 3 by @aneagoie
+import os
 from PIL import Image
 ASCII_CHARS = [ '#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
 
@@ -46,6 +47,34 @@ def txtfile(txt):
     with open("Output.txt", "w") as text_file:
         text_file.write("%s" % txt)
 
+def htmlfile(txt):
+    with open("Output.html", "w") as html_file:
+        code = """
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8" />
+                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>ASCII Art</title>
+                <style type="text/css">
+                    h2 {{
+                    font-family: Arial;
+                    }}
+                    pre {{
+                        user-select: none;
+                    }}
+                </style>
+            </head>
+            <body>
+            <h2>Your Image in ASCII Code !!!</h2>
+                <pre>{ascii}</pre>
+            </body>
+        </html>
+        """.format(ascii = txt)
+        html_file.write("%s" % code)
+        print("\nYou can find the HTML file here: {0}\n\n".format(os.path.realpath(html_file.name)))
+
 
 def handle_image_conversion(image_filepath):
     image = None
@@ -59,6 +88,7 @@ def handle_image_conversion(image_filepath):
     image_ascii = convert_image_to_ascii(image)
     print(image_ascii)
     txtfile(image_ascii)
+    htmlfile(image_ascii)
 
 if __name__=='__main__':
     import sys
