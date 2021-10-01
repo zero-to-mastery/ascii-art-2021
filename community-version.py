@@ -21,7 +21,6 @@ def convert_to_grayscale(image):
 def map_pixels_to_ascii_chars(image, range_width=25):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
-
     0-255 is divided into 11 ranges of 25 pixels each.
     """
 
@@ -43,6 +42,11 @@ def convert_image_to_ascii(image, new_width=100):
 
     return "\n".join(image_ascii)
 
+def txtfile(txt):
+    with open("Output.txt", "w") as text_file:
+        text_file.write("%s" % txt)
+
+
 def handle_image_conversion(image_filepath):
     image = None
     try:
@@ -54,6 +58,7 @@ def handle_image_conversion(image_filepath):
 
     image_ascii = convert_image_to_ascii(image)
     print(image_ascii)
+    txtfile(image_ascii)
 
 if __name__=='__main__':
     import sys
