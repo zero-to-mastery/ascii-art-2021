@@ -1,3 +1,8 @@
+ ---
+> ⚠   **NOTE:**  Hacktoberfest officially starts on October 1st - This project will remain archived until then!
+---
+
+
 <img src="https://raw.githubusercontent.com/dawsonbooth/ascii-art/master/logo.png" width="400" align="right"/>
 
 
