@@ -63,7 +63,10 @@ def handle_image_conversion(image_filepath):
 if __name__=='__main__':
     import sys
 
-    image_file_path = sys.argv[1]
+    try:
+        image_file_path = sys.argv[1]
+    except IndexError:
+        image_file_path = input('Enter the image file path (an example image is located at "example/ztm-logo.png"): ')
     print(image_file_path)
     ascii_img = handle_image_conversion(image_file_path)
     print(ascii_img)
