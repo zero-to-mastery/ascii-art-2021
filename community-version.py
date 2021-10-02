@@ -49,7 +49,6 @@ def write_to_txtfile(txt):
 
 
 def handle_image_conversion(image_filepath):
-    image = None
     try:
         image = Image.open(image_filepath)
     except Exception as err:
@@ -60,12 +59,13 @@ def handle_image_conversion(image_filepath):
         return ascii_img
 
 
-def get_file_path():
-    image_file_path = input('Enter the image file path (an example image is located at "example/ztm-logo.png"): ')
-    if not os.path.isfile(image_file_path):
-        print(f'Could not find file at "{image_file_path}". Using example image instead...')
-        return 'example/ztm-logo.png'
-    return image_file_path
+def validate_file_path(path):
+    if not os.path.isfile(path):
+        print(f'Invalid input. Could not find file at "{path}".')
+        print('A test image is located at "example/ztm-logo.png"')
+        path = input('Enter a valid file path: ')
+        validate_file_path(path)
+    return path
 
 if __name__=='__main__':
     import sys
@@ -73,7 +73,8 @@ if __name__=='__main__':
     try:
         image_file_path = sys.argv[1]
     except IndexError:
-        image_file_path = get_file_path()
+        image_file_path = input('Enter the image file path: ')
+    image_file_path = validate_file_path(image_file_path)
     print(image_file_path)
     ascii_img = handle_image_conversion(image_file_path)
     print(ascii_img)
