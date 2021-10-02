@@ -86,9 +86,6 @@ if __name__=='__main__':
 
     try:
         image_file_path = sys.argv[1]
-        print(f'Could not find file at "{image_file_path}". Try again...')
-        if not os.path.isfile(image_file_path):
-            image_file_path = get_file_path()
     except IndexError:
         image_file_path = input('Enter the image file path: ')
     image_file_path = validate_file_path(image_file_path)
