@@ -1,11 +1,24 @@
 # this project requires Pillow installation: https://pillow.readthedocs.io/en/stable/installation.html
 
-#code credit goes to: https://www.hackerearth.com/practice/notes/beautiful-python-a-simple-ascii-art-generator-from-images/
-#code modified to work with Python 3 by @aneagoie
-from PIL import Image
+# code credit goes to: https://www.hackerearth.com/practice/notes/beautiful-python-a-simple-ascii-art-generator-from-images/
+# code modified to work with Python 3 by @aneagoie
+
+# Usage Instructions:
+
+# 1. Clone this repo as it is!
+# 2. Open Terminal/cmd prompt, change the directory to the location of this repo
+# 3. Run the cmd 'python3 community-version.py image_file_path' 
+# 4. Get the output on cmd window and checkout the saved text file too
+
+# Note:
+# Please change the instructions according to the fix or features contributed code. 
+# comment the contribution to make others understand easy (follow the best comment practices).
+
+
+
 import os
+from PIL import Image
 ASCII_CHARS = [ '#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
-ASCII_CHARS = ['#', '@', 's', '.', '?', '*', '+', ';', ',' ,'.']
 def scale_image(image, new_width=100):
     """Resizes an image preserving the aspect ratio.
     """
@@ -22,7 +35,6 @@ def convert_to_grayscale(image):
 def map_pixels_to_ascii_chars(image, range_width=25):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
-
     0-255 is divided into 11 ranges of 25 pixels each.
     """
 
@@ -32,7 +44,7 @@ def map_pixels_to_ascii_chars(image, range_width=25):
 
     return "".join(pixels_to_chars)
 
-def convert_image_to_ascii(image, new_width=100, center=True):
+def convert_image_to_ascii(image, new_width=100):
     image = scale_image(image)
     image = convert_to_grayscale(image)
 
@@ -42,31 +54,56 @@ def convert_image_to_ascii(image, new_width=100, center=True):
     image_ascii = [pixels_to_chars[index: index + new_width] for index in
             range(0, len_pixels_to_chars, new_width)]
 
-    if center:
-    	term_width = os.get_terminal_size().columns // 8
-    	image_ascii = [" " * term_width + x for x in image_ascii]
+    
     return "\n".join(image_ascii)
 
+def write_to_txtfile(txt):
+    with open("output.txt", "w") as text_file:
+        text_file.write(txt)
+
+
 def handle_image_conversion(image_filepath):
-    image = None
     try:
         image = Image.open(image_filepath)
-    except Exception as e:
+    except Exception as err:
         print(f"Unable to open image file {image_filepath}.")
-        print(e)
-        return
+        print(err)
+    else:
+        ascii_img = convert_image_to_ascii(image)
+        return ascii_img
 
-    image_ascii = convert_image_to_ascii(image)
-    print(image_ascii)
+
+def validate_file_path(path):
+    if not os.path.isfile(path):
+        print(f'Invalid input. Could not find file at "{path}".')
+        print('A test image is located at "example/ztm-logo.png"')
+        path = input('Enter a valid file path: ')
+        validate_file_path(path)
+    return path
+
+def validate_file_extension(path):
+    allowed_extensions = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
+    filename, ext = os.path.splitext(path)
+
+    if ext[1:] not in allowed_extensions:
+        print(f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
+        path = input('Enter a valid image path: ')
+        validate_file_extension(path)
+
+    return path
+
 
 if __name__=='__main__':
     import sys
 
-    image_file_path = sys.argv[1]
-    print(image_file_path)
-    handle_image_conversion(image_file_path)
+    try:
+        image_file_path = sys.argv[1]
+    except IndexError:
+        image_file_path = input('Enter the image file path: ')
+    image_file_path = validate_file_extension(image_file_path)
+    image_file_path = validate_file_path(image_file_path)
 
-
-
-
+    ascii_img = handle_image_conversion(image_file_path)
+    print(ascii_img)
+    write_to_txtfile(ascii_img)
 
