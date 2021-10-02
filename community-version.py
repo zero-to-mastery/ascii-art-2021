@@ -1,7 +1,21 @@
 # this project requires Pillow installation: https://pillow.readthedocs.io/en/stable/installation.html
 
-#code credit goes to: https://www.hackerearth.com/practice/notes/beautiful-python-a-simple-ascii-art-generator-from-images/
-#code modified to work with Python 3 by @aneagoie
+# code credit goes to: https://www.hackerearth.com/practice/notes/beautiful-python-a-simple-ascii-art-generator-from-images/
+# code modified to work with Python 3 by @aneagoie
+
+# Usage Instructions:
+
+# 1. Clone this repo as it is!
+# 2. Open Terminal/cmd prompt, change the directory to the location of this repo
+# 3. Run the cmd 'python3 community-version.py image_file_path' 
+# 4. Get the output on cmd window and checkout the saved text file too
+
+# Note:
+# Please change the instructions according to the fix or features contributed code. 
+# comment the contribution to make others understand easy (follow the best comment practices).
+
+
+
 import os
 from PIL import Image
 ASCII_CHARS = [ '#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
@@ -72,9 +86,13 @@ if __name__=='__main__':
 
     try:
         image_file_path = sys.argv[1]
+        print(f'Could not find file at "{image_file_path}". Try again...')
+        if not os.path.isfile(image_file_path):
+            image_file_path = get_file_path()
     except IndexError:
         image_file_path = get_file_path()
     print(image_file_path)
     ascii_img = handle_image_conversion(image_file_path)
     print(ascii_img)
     write_to_txtfile(ascii_img)
+
