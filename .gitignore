@@ -1,2 +1,6 @@
-venv
+.idea/
+.venv/
+venv/
 output.txt
+Makefile
+
