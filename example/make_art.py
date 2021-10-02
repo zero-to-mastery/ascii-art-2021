@@ -3,7 +3,7 @@
 #code credit goes to: https://www.hackerearth.com/practice/notes/beautiful-python-a-simple-ascii-art-generator-from-images/
 #code modified to work with Python 3 by @aneagoie
 from PIL import Image
-ASCII_CHARS = [ '#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
+ASCII_CHARS = [ ' ', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
 
 def scale_image(image, new_width=100):
     """Resizes an image preserving the aspect ratio.
@@ -26,8 +26,12 @@ def map_pixels_to_ascii_chars(image, range_width=25):
     """
 
     pixels_in_image = list(image.getdata())
+
     pixels_to_chars = [ASCII_CHARS[int(pixel_value/range_width)] for pixel_value in
+    # pixels_to_chars = ["." for pixel_value in
             pixels_in_image]
+
+    print(pixels_in_image[0], pixels_to_chars[0])
 
     return "".join(pixels_to_chars)
 
@@ -54,6 +58,9 @@ def handle_image_conversion(image_filepath):
 
     image_ascii = convert_image_to_ascii(image)
     print(image_ascii)
+    f = open("out1.txt", "a")
+    f.write(image_ascii)
+    f.close()
 
 if __name__=='__main__':
     import sys
