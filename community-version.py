@@ -42,9 +42,9 @@ def convert_image_to_ascii(image, new_width=100):
 
     return "\n".join(image_ascii)
 
-def txtfile(txt):
-    with open("Output.txt", "w") as text_file:
-        text_file.write("%s" % txt)
+def write_to_txtfile(txt):
+    with open("output.txt", "w") as text_file:
+        text_file.write(txt)
 
 
 def handle_image_conversion(image_filepath):
@@ -56,13 +56,18 @@ def handle_image_conversion(image_filepath):
         print(err)
         return
 
-    image_ascii = convert_image_to_ascii(image)
-    print(image_ascii)
-    txtfile(image_ascii)
+    ascii_img = convert_image_to_ascii(image)
+    return ascii_img
+    
 
 if __name__=='__main__':
     import sys
 
-    image_file_path = sys.argv[1]
+    try:
+        image_file_path = sys.argv[1]
+    except IndexError:
+        image_file_path = input('Enter the image file path (an example image is located at "example/ztm-logo.png"): ')
     print(image_file_path)
-    handle_image_conversion(image_file_path)
+    ascii_img = handle_image_conversion(image_file_path)
+    print(ascii_img)
+    write_to_txtfile(ascii_img)
