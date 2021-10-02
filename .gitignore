@@ -1,5 +1,7 @@
-# Project output
+### Project ###
+.idea/
 output.txt
+Makefile
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
