@@ -3,6 +3,7 @@ import PIL.Image
 from tkinter import *
 from tkinter import font
 import sys
+import os
 
 ASCII_CHARS = [ '#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
 
@@ -47,6 +48,8 @@ def write_to_txtfile(txt):
     try:
         with open("output.txt", "w") as text_file:
             text_file.write(txt)
+            ms.showinfo("Success","Image converted to ASCII Art ! Check output.txt !")
+            root.destroy()
     except:
         return
 
