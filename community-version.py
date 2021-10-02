@@ -81,6 +81,19 @@ def validate_file_path(path):
         validate_file_path(path)
     return path
 
+def validate_file_extension(path):
+    allowed_extensions = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
+    filename, ext = os.path.splitext(path)
+
+    if ext[1:] not in allowed_extensions:
+        print(f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
+        path = input('Enter a valid image path: ')
+        validate_file_extension(path)
+
+    return path
+
+
+
 if __name__=='__main__':
     import sys
 
@@ -88,6 +101,8 @@ if __name__=='__main__':
         image_file_path = sys.argv[1]
     except IndexError:
         image_file_path = input('Enter the image file path: ')
+    image_file_path = validate_file_extension(image_file_path)
+    
     image_file_path = validate_file_path(image_file_path)
     print(image_file_path)
     ascii_img = handle_image_conversion(image_file_path)
