@@ -2,6 +2,7 @@
 
 #code credit goes to: https://www.hackerearth.com/practice/notes/beautiful-python-a-simple-ascii-art-generator-from-images/
 #code modified to work with Python 3 by @aneagoie
+import os
 from PIL import Image
 ASCII_CHARS = [ '#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
 
@@ -54,11 +55,17 @@ def handle_image_conversion(image_filepath):
     except Exception as err:
         print(f"Unable to open image file {image_filepath}.")
         print(err)
-        return
+    else:
+        ascii_img = convert_image_to_ascii(image)
+        return ascii_img
 
-    ascii_img = convert_image_to_ascii(image)
-    return ascii_img
-    
+
+def get_file_path():
+    image_file_path = input('Enter the image file path (an example image is located at "example/ztm-logo.png"): ')
+    if not os.path.isfile(image_file_path):
+        print(f'Could not find file at "{image_file_path}". Using example image instead...')
+        return 'example/ztm-logo.png'
+    return image_file_path
 
 if __name__=='__main__':
     import sys
@@ -66,7 +73,7 @@ if __name__=='__main__':
     try:
         image_file_path = sys.argv[1]
     except IndexError:
-        image_file_path = input('Enter the image file path (an example image is located at "example/ztm-logo.png"): ')
+        image_file_path = get_file_path()
     print(image_file_path)
     ascii_img = handle_image_conversion(image_file_path)
     print(ascii_img)
