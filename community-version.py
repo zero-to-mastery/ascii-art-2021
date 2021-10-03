@@ -99,14 +99,20 @@ if __name__=='__main__':
     import sys
 
     
-    parser = argparse.ArgumentParser(description="Converts images into ASCII art.", add_help=True)
-    parser.add_argument("-i", "--image", help="File path to input image", nargs=1, action="store")
-    parser.add_argument("-o", "--outfile", help="File path to output text file", nargs="?", action="store")
+    parser = argparse.ArgumentParser(description="Converts images into ASCII art.")
+    parser.add_argument("-i", "--image",
+                        help="File path to input image (default: %(default)s)",
+                        default="./example/ztm-logo.png",
+                        action="store")
+    parser.add_argument("-o", "--outfile", 
+                        help="File path to output text file (default: None)", 
+                        nargs="?",
+                        action="store")
 
     args = parser.parse_args()
 
     try:
-        image_file_path = args.image[0]
+        image_file_path = args.image
     except IndexError:
         image_file_path = input('Enter the image file path: ')
     image_file_path = validate_file_extension(image_file_path)
