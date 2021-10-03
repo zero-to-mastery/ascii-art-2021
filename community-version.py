@@ -34,6 +34,9 @@ def scale_image(image, new_width=100):
 def convert_to_grayscale(image):
     return image.convert('L')
 
+def convert_to_color(image):
+    return image.convert('RGB')
+
 def map_pixels_to_ascii_chars(image, range_width=25):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
@@ -49,6 +52,7 @@ def map_pixels_to_ascii_chars(image, range_width=25):
 def convert_image_to_ascii(image, new_width=100):
     image = scale_image(image)
     image = convert_to_grayscale(image)
+    image = convert_to_color(image)
 
     pixels_to_chars = map_pixels_to_ascii_chars(image)
     len_pixels_to_chars = len(pixels_to_chars)
