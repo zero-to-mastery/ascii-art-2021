@@ -18,6 +18,7 @@
 
 import os
 from PIL import Image
+import argparse
 ASCII_CHARS = [ '#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
 
 def scale_image(image, new_width=100):
@@ -57,9 +58,9 @@ def convert_image_to_ascii(image, new_width=100):
 
     return "\n".join(image_ascii)
 
-def write_to_txtfile(txt):
-    with open("output.txt", "w") as text_file:
-        text_file.write(txt)
+def write_to_txtfile(image_txt, out_file):
+    with open(out_file, "w") as text_file:
+        text_file.write(image_txt)
 
 
 def handle_image_conversion(image_filepath):
@@ -97,8 +98,15 @@ def validate_file_extension(path):
 if __name__=='__main__':
     import sys
 
+    
+    parser = argparse.ArgumentParser(description="Converts images into ASCII art.", add_help=True)
+    parser.add_argument("-i", "--image", help="File path to input image", nargs=1, action="store")
+    parser.add_argument("-o", "--outfile", help="File path to output text file", nargs="?", action="store")
+
+    args = parser.parse_args()
+
     try:
-        image_file_path = sys.argv[1]
+        image_file_path = args.image[0]
     except IndexError:
         image_file_path = input('Enter the image file path: ')
     image_file_path = validate_file_extension(image_file_path)
@@ -107,5 +115,7 @@ if __name__=='__main__':
     print(image_file_path)
     ascii_img = handle_image_conversion(image_file_path)
     print(ascii_img)
-    write_to_txtfile(ascii_img)
+
+    if args.outfile is not None:
+        write_to_txtfile(ascii_img, args.outfile)
 
