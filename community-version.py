@@ -11,7 +11,7 @@
 # 4. Get the output on cmd window and checkout the saved text file too
 
 # Note:
-# Please change the instructions according to the fix or features contributed code. 
+# Please change the instructions according to the fix or features contributed code.
 # comment the contribution to make others understand easy (follow the best comment practices).
 
 import argparse
@@ -47,24 +47,31 @@ def validate_file_extension(path):
     return path
 
 if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser(description="Converts images into ASCII art.", add_help=True)
-    parser.add_argument("-i", "--image", help="File path to input image", nargs=1, action="store")
-    parser.add_argument("-o", "--outfile", help="File path to output text file", nargs="?", action="store")
+    
+    parser = argparse.ArgumentParser(description="Converts images into ASCII art.")
+    parser.add_argument("-i", "--image",
+                        help="File path to input image (default: %(default)s)",
+                        default="./example/ztm-logo.png",
+                        action="store")
+    parser.add_argument("-o", "--outfile",
+                        help="File path to output text file (default: None)",
+                        nargs="?",
+                        action="store")
 
     args = parser.parse_args()
 
     try:
-        image_file_path = args.image[0]
+        image_file_path = args.image
     except IndexError:
         image_file_path = input('Enter the image file path: ')
         
     image_file_path = validate_file_extension(image_file_path)
     image_file_path = validate_file_path(image_file_path)
     
+    print(image_file_path)
+    
     ztm_logo_img_handler = ImageHandler(image_file_path)
     
-    print(image_file_path)
     ascii_img = ztm_logo_img_handler.create_ascii_image()
     
     print(ascii_img)
