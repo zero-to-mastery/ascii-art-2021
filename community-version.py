@@ -7,19 +7,25 @@
 
 # 1. Clone this repo as it is!
 # 2. Open Terminal/cmd prompt, change the directory to the location of this repo
-# 3. Run the cmd 'python3 community-version.py image_file_path' 
+# 3. Run the cmd 'python3 community-version.py image_file_path'
 # 4. Get the output on cmd window and checkout the saved text file too
 
 # Note:
-# Please change the instructions according to the fix or features contributed code. 
+# Please change the instructions according to the fix or features contributed code.
 # comment the contribution to make others understand easy (follow the best comment practices).
 
 
-
 import os
-from PIL import Image
+from PIL import Image, ImageOps  # ImageOps optional
 import argparse
-ASCII_CHARS = [ '#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
+ASCII_CHARS = ["@", "#", "$", "%", "?", "*", "+", ";", ":", ",", ".",
+               '-', '_', '+', '<', '>', 'i', '!', 'l', 'I', '?',
+               '/', '"', '|', '(', ')', '1', '{', '}', '[', ']',
+               'r', 'c', 'v', 'u', 'n', 'x', 'z', 'j', 'f', 't',
+               'L', 'C', 'J', 'U', 'Y', 'X', 'Z', 'O', '0', 'Q',
+               'o', 'a', 'h', 'k', 'b', 'd', 'p', 'q', 'w', 'm',
+               '*', 'W', 'M', 'B', '8']
+
 
 def scale_image(image, new_width=100):
     """Resizes an image preserving the aspect ratio.
@@ -31,8 +37,11 @@ def scale_image(image, new_width=100):
     new_image = image.resize((new_width, new_height))
     return new_image
 
+
 def convert_to_grayscale(image):
-    return image.convert('L')
+    img = ImageOps.grayscale(image)
+    return img
+
 
 def map_pixels_to_ascii_chars(image, range_width=25):
     """Maps each pixel to an ascii char based on the range
@@ -42,9 +51,10 @@ def map_pixels_to_ascii_chars(image, range_width=25):
 
     pixels_in_image = list(image.getdata())
     pixels_to_chars = [ASCII_CHARS[int(pixel_value/range_width)] for pixel_value in
-            pixels_in_image]
+                       pixels_in_image]
 
     return "".join(pixels_to_chars)
+
 
 def convert_image_to_ascii(image, new_width=100):
     image = scale_image(image)
@@ -54,9 +64,10 @@ def convert_image_to_ascii(image, new_width=100):
     len_pixels_to_chars = len(pixels_to_chars)
 
     image_ascii = [pixels_to_chars[index: index + new_width] for index in
-            range(0, len_pixels_to_chars, new_width)]
+                   range(0, len_pixels_to_chars, new_width)]
 
     return "\n".join(image_ascii)
+
 
 def write_to_txtfile(image_txt, out_file):
     with open(out_file, "w") as text_file:
@@ -82,26 +93,29 @@ def validate_file_path(path):
         validate_file_path(path)
     return path
 
+
 def validate_file_extension(path):
     allowed_extensions = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
     filename, ext = os.path.splitext(path)
 
     if ext[1:] not in allowed_extensions:
-        print(f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
+        print(
+            f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
         path = input('Enter a valid image path: ')
         validate_file_extension(path)
 
     return path
 
 
-
-if __name__=='__main__':
+if __name__ == '__main__':
     import sys
 
-    
-    parser = argparse.ArgumentParser(description="Converts images into ASCII art.", add_help=True)
-    parser.add_argument("-i", "--image", help="File path to input image", nargs=1, action="store")
-    parser.add_argument("-o", "--outfile", help="File path to output text file", nargs="?", action="store")
+    parser = argparse.ArgumentParser(
+        description="Converts images into ASCII art.", add_help=True)
+    parser.add_argument(
+        "-i", "--image", help="File path to input image", nargs=1, action="store")
+    parser.add_argument(
+        "-o", "--outfile", help="File path to output text file", nargs="?", action="store")
 
     args = parser.parse_args()
 
@@ -110,7 +124,7 @@ if __name__=='__main__':
     except IndexError:
         image_file_path = input('Enter the image file path: ')
     image_file_path = validate_file_extension(image_file_path)
-    
+
     image_file_path = validate_file_path(image_file_path)
     print(image_file_path)
     ascii_img = handle_image_conversion(image_file_path)
@@ -118,4 +132,3 @@ if __name__=='__main__':
 
     if args.outfile is not None:
         write_to_txtfile(ascii_img, args.outfile)
-
