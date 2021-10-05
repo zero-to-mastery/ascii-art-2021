@@ -13,7 +13,6 @@ def main():
     ztm_logo_img_handler = ImageHandler(image_file_path)
 
     ascii_img = ztm_logo_img_handler.create_ascii_image()
-    ztm_logo_img_handler.print_ascii_image()
 
     if args.outfile:
         file_manager.write_to_file(ascii_img, args.outfile)
