@@ -19,9 +19,9 @@ def main():
         image_file_path = entry1.get()
     ascii_img = handle_image_conversion(image_file_path)
     print(ascii_img)
-    write_to_txtfile(ascii_img, "output.txt")
-    success.config(
-        text='Image converted successfully! File saved as \'output.txt\'', fg='white')  # Success message displays upon conversion
+#     write_to_txtfile(ascii_img, "output.txt")
+#     success.config(
+#         text='Image converted successfully! File saved as \'output.txt\'', fg='white')  # Success message displays upon conversion
 
 
 if __name__ == '__main__':
