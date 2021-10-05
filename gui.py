@@ -8,20 +8,23 @@ from tkinter import filedialog
 import sys
 
 
-from community_version import write_to_txtfile, handle_image_conversion
+from community_version import handle_image_conversion
 
 
 def main():
     global entry1
+    global entry2
     try:
         image_file_path = sys.argv[1]
     except IndexError:
         image_file_path = entry1.get()
     ascii_img = handle_image_conversion(image_file_path)
-    print(ascii_img)
-#     write_to_txtfile(ascii_img, "output.txt")
-#     success.config(
-#         text='Image converted successfully! File saved as \'output.txt\'', fg='white')  # Success message displays upon conversion
+    if entry2:
+        with open(entry2.get(), 'w') as file:
+            file.write(ascii_img)
+            root.destroy()
+    else:
+        print(ascii_img)
 
 
 if __name__ == '__main__':
@@ -36,6 +39,13 @@ if __name__ == '__main__':
         tempdir = filedialog.askopenfilename(parent=root, filetypes=(
             ('png files', '*.png'), ('jpeg files', '*.jpg'), ('all files', '*.*')), title='Please select a file')
         entry1.insert(tk.END, tempdir)
+
+    def browseOutputFile():
+        global entry2
+        tempdir = filedialog.askopenfilename(parent=root, filetypes=(
+            ('txt files', '*.txt'),('all files', '*.*')), title='Please select a file'
+        )
+        entry2.insert(tk.END, tempdir)
 
     Label(root, text="Image to ASCII Converter", fg="black",
           font=("Times", 25, "bold"), width=25, pady=5, padx=25).pack()
@@ -52,9 +62,21 @@ if __name__ == '__main__':
                            width=10, bd=-2, command=browsePic)  # Button to browse through directories
     browse_btn.place(x=705, y=140)
 
+    label1 = Label(root, text="Please enter the file path or choose a text file for output:",
+                   fg="white", bg='black', font=(20))
+    label1.place(x=140, y=180)
+
+    entry2 = Entry(root, bd=5, font=(15), width=60)
+    entry2.bind(main)
+    entry2.place(x=140, y=230)
+
+    output_file_btn = tk.Button(root, text='Choose File', font=("Arial", 16), pady=6,
+                           width=10, bd=-2, command=browseOutputFile)  # Button to browse through directories
+    output_file_btn.place(x=705, y=230)
+
     convrt_btn = Button(root, text="Convert", font=("Arial", 20),
                         width=10, padx=5, pady=5, command=main)
-    convrt_btn.place(x=340, y=180)
+    convrt_btn.place(x=340, y=340)
 
     success = Label(root, text='', bg='black')
     success.pack(pady=5)
