@@ -4,6 +4,12 @@ from modules import command_line_args as cli
 from modules.image_handler import ImageHandler
 
 
+def get_ztm_logo_ascii_img():
+    ztm_logo_img_handler = ImageHandler()
+
+    return ztm_logo_img_handler.create_ascii_image()
+
+
 def main():
     args = cli.parse_args()
 
@@ -12,7 +18,7 @@ def main():
 
     ztm_logo_img_handler = ImageHandler(image_file_path)
 
-    ascii_img = ztm_logo_img_handler.create_ascii_image()
+    ascii_img = get_ztm_logo_ascii_img()
 
     if args.outfile:
         file_manager.write_to_file(ascii_img, args.outfile)
