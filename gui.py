@@ -49,7 +49,7 @@ if __name__ == '__main__':
     entry1.place(x=140, y=140)
 
     browse_btn = tk.Button(root, text='Choose File', font=("Arial", 16), pady=6,
-                           width=7, bd=-2, command=browsePic)  # Button to browse through directories
+                           width=10, bd=-2, command=browsePic)  # Button to browse through directories
     browse_btn.place(x=705, y=140)
 
     convrt_btn = Button(root, text="Convert", font=("Arial", 20),
