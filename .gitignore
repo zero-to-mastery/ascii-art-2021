@@ -2,6 +2,7 @@
 .idea/
 output.txt
 Makefile
+/webapp/uploads/*
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
