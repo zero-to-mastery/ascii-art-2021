@@ -8,11 +8,11 @@ authors = ["Zero to Mastery <admin@example.com>"]
 python = "^3.9"
 Pillow = "^8.3.2"
 pyfiglet = "^0.8.post1"
+Flask = "^2.0.2"
 
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-ascii_art = "cli:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
