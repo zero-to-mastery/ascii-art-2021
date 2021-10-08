@@ -12,21 +12,25 @@
 # 5. To see what more the script can do with ascii, run: 'python3 community_version.py --help`
 
 # Note:
-# Please change the instructions according to the fix or features contributed code. 
+# Please change the instructions according to the fix or features contributed code.
 # comment the contribution to make others understand easy (follow the best comment practices).
-
+import argparse
+import logging.config
 import os
 from PIL import Image
-import argparse
+from logger_config import LOGGING_CONFIG
 
 ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
+
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger(__name__)
 
 
 def scale_image(image, new_width=100):
     """Resizes an image preserving the aspect ratio.
     """
     (original_width, original_height) = image.size
-    aspect_ratio = original_height/float(original_width)
+    aspect_ratio = original_height / float(original_width)
     new_height = int(aspect_ratio * new_width)
 
     new_image = image.resize((new_width, new_height))
@@ -51,6 +55,7 @@ def map_pixels_to_ascii_chars(image, range_width=25):
 
 
 def convert_image_to_ascii(image, new_width=100):
+    logger.info("Converting the image to ascii")
     image = scale_image(image)
     image = convert_to_grayscale(image)
 
@@ -60,6 +65,7 @@ def convert_image_to_ascii(image, new_width=100):
     image_ascii = [pixels_to_chars[index: index + new_width]
                    for index in range(0, len_pixels_to_chars, new_width)]
 
+    logger.info("Successfully converted the image to ascii")
     return "\n".join(image_ascii)
 
 
@@ -72,16 +78,16 @@ def handle_image_conversion(image_filepath):
     try:
         image = Image.open(image_filepath)
     except Exception as err:
-        print(f"Unable to open image file {image_filepath}.")
-        print(err)
+        logger.error(f"Unable to open image file {image_filepath}.")
+        logger.error(err)
     else:
         return convert_image_to_ascii(image)
 
 
 def validate_file_path(path):
     if not os.path.isfile(path):
-        print(f'Invalid input. Could not find file at "{path}".')
-        print('A test image is located at "example/ztm-logo.png"')
+        logger.error(f'Invalid input. Could not find file at "{path}".')
+        logger.info('A test image is located at "example/ztm-logo.png"')
         path = input('Enter a valid file path: ')
         validate_file_path(path)
     return path
@@ -92,7 +98,7 @@ def validate_file_extension(path):
     filename, ext = os.path.splitext(path)
 
     if ext[1:] not in allowed_extensions:
-        print(f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
+        logger.error(f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
         path = input('Enter a valid image path: ')
         validate_file_extension(path)
 
@@ -125,7 +131,7 @@ def main():
     args = _parse_args()
     image_file_path = validate_file_extension(args.image)
     image_file_path = validate_file_path(image_file_path)
-    print(image_file_path)
+    logger.info(image_file_path)
     ascii_img = handle_image_conversion(image_file_path)
 
     if args.outfile:
