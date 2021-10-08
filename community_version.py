@@ -16,7 +16,7 @@
 # comment the contribution to make others understand easy (follow the best comment practices).
 
 import os
-from PIL import Image
+from PIL import Image, ImageDraw
 import argparse
 import csv
 
@@ -75,7 +75,28 @@ def write_to_txtfile(image_txt, out_file):
         text_file.write(image_txt)
 
 
-def handle_image_conversion(image_filepath, key_filepath):
+def save_as_img(image_txt, out_file):
+    """Takes the ASCII text as input, writes it to an image file and the saves
+     it to the path inputted."""
+
+    # Make a blank white image.
+    text_list = image_txt.split("\n")
+
+    """Every row takes 10px, so height should be len(text_list) * 10 and every
+     letter of a row takes 6px, so len(elements in a row) * 6 would get the
+     correct width."""
+    img = Image.new(
+        'RGB', (len(text_list[0]) * 6, len(text_list) * 10), color='white')
+
+    draw = ImageDraw.Draw(img)  # Creates an ImageDraw object of img.
+    for i in range(len(text_list)):
+        # Draws the text on the blank image.
+        draw.text((0, (10 * i)), text_list[i], (0, 0, 0))
+
+    img.save(out_file)
+
+
+def handle_image_conversion(image_filepath , key_filepath):
     try:
         image = Image.open(image_filepath)
     except Exception as err:
@@ -100,7 +121,8 @@ def validate_file_extension(path):
     filename, ext = os.path.splitext(path)
 
     if ext[1:] not in allowed_extensions:
-        print(f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
+        print(
+            f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
         path = input('Enter a valid image path: ')
         validate_file_extension(path)
 
@@ -116,7 +138,8 @@ def _parse_args():
     and specify the details you want.
     The docs for argparse are at: https://docs.python.org/3/library/argparse.html
     """
-    parser = argparse.ArgumentParser(description="Converts images into ASCII art.")
+    parser = argparse.ArgumentParser(
+        description="Converts images into ASCII art.")
     parser.add_argument("-i", "--image",
                         help="File path to input image (default: %(default)s)",
                         default="./example/ztm-logo.png",
@@ -128,6 +151,10 @@ def _parse_args():
     parser.add_argument("-k", "--key",
                         help="Key of ASCII characters to use in rendering",
                         default="./akey.txt",
+                        action="store")
+    parser.add_argument("-s", "--saveimg",
+                        help="Save the ASCII into an image file",
+                        nargs="?",
                         action="store")
 
     return parser.parse_args()
@@ -143,6 +170,8 @@ def main():
     ascii_img = handle_image_conversion(image_file_path, ascii_key_path)
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)
+    if args.saveimg:
+        save_as_img(ascii_img, args.saveimg)
     else:
         print(ascii_img)
 
