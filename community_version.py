@@ -12,11 +12,11 @@
 # 5. To see what more the script can do with ascii, run: 'python3 community_version.py --help`
 
 # Note:
-# Please change the instructions according to the fix or features contributed code. 
+# Please change the instructions according to the fix or features contributed code.
 # comment the contribution to make others understand easy (follow the best comment practices).
 
 import os
-from PIL import Image
+from PIL import Image, ImageDraw
 import argparse
 
 ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
@@ -65,6 +65,27 @@ def convert_image_to_ascii(image, new_width=100):
 def write_to_txtfile(image_txt, out_file):
     with open(out_file, "w") as text_file:
         text_file.write(image_txt)
+
+
+def save_as_img(image_txt, out_file):
+    """Takes the ASCII text as input, writes it to an image file and the saves
+     it to the path inputted."""
+
+    # Make a blank white image.
+    text_list = image_txt.split("\n")
+
+    """Every row takes 10px, so height should be len(text_list) * 10 and every
+     letter of a row takes 6px, so len(elements in a row) * 6 would get the
+     correct width."""
+    img = Image.new(
+        'RGB', (len(text_list[0]) * 6, len(text_list) * 10), color='white')
+
+    draw = ImageDraw.Draw(img)  # Creates an ImageDraw object of img.
+    for i in range(len(text_list)):
+        # Draws the text on the blank image.
+        draw.text((0, (10 * i)), text_list[i], (0, 0, 0))
+
+    img.save(out_file)
 
 
 def handle_image_conversion(image_filepath):
@@ -123,6 +144,10 @@ def _parse_args():
                         help="write the ASCII into this file instead of the default STDOUT",
                         nargs="?",
                         action="store")
+    parser.add_argument("-s", "--saveimg",
+                        help="Save the ASCII into an image file",
+                        nargs="?",
+                        action="store")
 
     return parser.parse_args()
 
@@ -136,6 +161,8 @@ def main():
 
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)
+    if args.saveimg:
+        save_as_img(ascii_img, args.saveimg)
     else:
         print(ascii_img)
 
