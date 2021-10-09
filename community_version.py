@@ -20,6 +20,7 @@ from PIL import Image
 import argparse
 
 ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
+ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
 
 
 def scale_image(image, new_width=100):
@@ -28,9 +29,7 @@ def scale_image(image, new_width=100):
     (original_width, original_height) = image.size
     aspect_ratio = original_height/float(original_width)
     new_height = int(aspect_ratio * new_width)
-
-    new_image = image.resize((new_width, new_height))
-    return new_image
+    return image.resize((new_width, new_height))
 
 
 def convert_to_grayscale(image):
@@ -87,12 +86,19 @@ def validate_file_path(path):
     return path
 
 
-def validate_file_extension(path):
-    allowed_extensions = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
-    filename, ext = os.path.splitext(path)
+def is_supported(path: str) -> bool:
+    """
+    Checks if the given path is for a supported file.
+    It uses the file extension in the path and compares
+    it against ALLOWED_EXTENSIONS.
+    """
+    _, ext = os.path.splitext(path)
+    return ext[1:].lower() in set(ALLOWED_EXTENSIONS)
 
-    if ext[1:] not in allowed_extensions:
-        print(f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
+
+def validate_file_extension(path):
+    if not is_supported(path):
+        print(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
         path = input('Enter a valid image path: ')
         validate_file_extension(path)
 

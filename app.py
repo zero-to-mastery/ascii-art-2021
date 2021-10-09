@@ -1,20 +1,19 @@
 import os
+
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.utils import secure_filename
-from community_version import handle_image_conversion
+
+from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS
 
 UPLOAD_FOLDER = './webapp/uploads'
 TXT_FOLDER = './webapp'
+DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
 
 app = Flask(__name__)
 app.secret_key = "my-very-secret-key-pls"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['TXT_FOLDER'] = TXT_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024 # File max size set to 4MB
-
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/')
@@ -30,7 +29,7 @@ def generate():
 
         file1 = request.files['file1']
 
-        if file1 and allowed_file(file1.filename):
+        if file1 and is_supported(file1.filename):
             path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
             file1.save(path)
 
@@ -43,12 +42,11 @@ def generate():
             return send_from_directory(app.config['TXT_FOLDER'], 'temp.txt', as_attachment=True)
 
         else:
-            return 'File must be a valid jpeg, png or jpg file'
+            return f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}"
 
 
 @app.route('/ztm-logo.html')
 def show_ztm_logo_ascii_img():
-    DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
     image = handle_image_conversion(DEFAULT_IMAGE_PATH)
     return render_template('ztm-logo.html', image=image)
 
