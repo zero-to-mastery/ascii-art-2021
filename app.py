@@ -19,31 +19,31 @@ def allowed_file(filename):
 
 @app.route('/')
 def get_index():
-  return render_template('index.html')
+    return render_template('index.html')
 
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
-  if request.method == 'POST':
-    if ('file1' not in request.files) or (request.files['file1'].filename == ''):
-      return 'No valid file found'
+    if request.method == 'POST':
+        if ('file1' not in request.files) or (request.files['file1'].filename == ''):
+            return 'No valid file found'
 
-    file1 = request.files['file1']
+        file1 = request.files['file1']
 
-    if file1 and allowed_file(file1.filename):
-      path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
-      file1.save(path)
+        if file1 and allowed_file(file1.filename):
+            path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+            file1.save(path)
 
-      ascii_image = handle_image_conversion(path)
-      with open('./webapp/temp.txt', 'w') as f:
-        f.write(ascii_image)
+            ascii_image = handle_image_conversion(path)
+            with open('./webapp/temp.txt', 'w') as f:
+                f.write(ascii_image)
 
-      if os.path.exists(path):
-        os.remove(path)
-      return send_from_directory(app.config['TXT_FOLDER'], 'temp.txt', as_attachment=True)
+            if os.path.exists(path):
+                os.remove(path)
+            return send_from_directory(app.config['TXT_FOLDER'], 'temp.txt', as_attachment=True)
 
-    else:
-      return 'File must be a valid jpeg, png or jpg file'
+        else:
+            return 'File must be a valid jpeg, png or jpg file'
 
 
 @app.route('/ztm-logo.html')
@@ -54,4 +54,4 @@ def show_ztm_logo_ascii_img():
 
 
 if __name__ == '__main__':
-  app.run(debug=True)
+    app.run(debug=True)
