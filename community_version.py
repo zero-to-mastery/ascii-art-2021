@@ -19,8 +19,8 @@ import os
 from PIL import Image, ImageDraw
 import argparse
 
-ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
-
+# ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
+ASCII_CHARS = [ '#', '@', '$', '0', '+', '?', '!', '=', '&', ';', '-', '*', ':', '~', ',', '.']
 
 def scale_image(image, new_width=100):
     """Resizes an image preserving the aspect ratio.
@@ -37,10 +37,10 @@ def convert_to_grayscale(image):
     return image.convert('L')
 
 
-def map_pixels_to_ascii_chars(image, range_width=25):
+def map_pixels_to_ascii_chars(image, range_width=16):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
-    0-255 is divided into 11 ranges of 25 pixels each.
+    0-255 is divided into 16 ranges of 26 pixels each.
     """
 
     pixels_in_image = list(image.getdata())
