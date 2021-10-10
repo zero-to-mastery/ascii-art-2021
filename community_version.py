@@ -25,8 +25,7 @@ def get_ascii_key(akey_filepath):
     """Pull a specific keyfile to index for ASCII rendering
     """
     with open(akey_filepath) as keyfile:
-        keyline = list(csv.reader(keyfile, delimiter=","))
-        return keyline[0]
+        return list(keyfile.read().strip())
 
 
 def scale_image(image, new_width=100):
