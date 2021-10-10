@@ -18,8 +18,14 @@
 import os
 from PIL import Image, ImageDraw
 import argparse
+import csv
 
-ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
+
+def get_ascii_key(akey_filepath):
+    """Pull a specific keyfile to index for ASCII rendering
+    """
+    with open(akey_filepath) as keyfile:
+        return list(keyfile.read().strip())
 
 
 def scale_image(image, new_width=100):
@@ -37,24 +43,24 @@ def convert_to_grayscale(image):
     return image.convert('L')
 
 
-def map_pixels_to_ascii_chars(image, range_width=25):
+def map_pixels_to_ascii_chars(image, key, range_width=25):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
     0-255 is divided into 11 ranges of 25 pixels each.
     """
-
+    ascii_key = get_ascii_key(key)
     pixels_in_image = list(image.getdata())
-    pixels_to_chars = [ASCII_CHARS[int(pixel_value / range_width)]
+    pixels_to_chars = [ascii_key[int(pixel_value / range_width)]
                        for pixel_value in pixels_in_image]
 
     return "".join(pixels_to_chars)
 
 
-def convert_image_to_ascii(image, new_width=100):
+def convert_image_to_ascii(image, key, new_width=100):
     image = scale_image(image)
     image = convert_to_grayscale(image)
 
-    pixels_to_chars = map_pixels_to_ascii_chars(image)
+    pixels_to_chars = map_pixels_to_ascii_chars(image, key)
     len_pixels_to_chars = len(pixels_to_chars)
 
     image_ascii = [pixels_to_chars[index: index + new_width]
@@ -89,14 +95,15 @@ def save_as_img(image_txt, out_file):
     img.save(out_file)
 
 
-def handle_image_conversion(image_filepath):
+def handle_image_conversion(image_filepath , key_filepath):
     try:
         image = Image.open(image_filepath)
     except Exception as err:
         print(f"Unable to open image file {image_filepath}.")
         print(err)
     else:
-        return convert_image_to_ascii(image)
+        key = key_filepath
+        return convert_image_to_ascii(image, key)
 
 
 def validate_file_path(path):
@@ -126,7 +133,7 @@ def _parse_args():
     Parses command-line arguments.
 
     The function returns an object that has the added arguments as attributes.
-    To add a new argument, add another entry of 'parser.add_argument(...)' 
+    To add a new argument, add another entry of 'parser.add_argument(...)'
     and specify the details you want.
     The docs for argparse are at: https://docs.python.org/3/library/argparse.html
     """
@@ -139,6 +146,10 @@ def _parse_args():
     parser.add_argument("-o", "--outfile",
                         help="write the ASCII into this file instead of the default STDOUT",
                         nargs="?",
+                        action="store")
+    parser.add_argument("-k", "--key",
+                        help="Key of ASCII characters to use in rendering",
+                        default="./akey.txt",
                         action="store")
     parser.add_argument("-s", "--saveimg",
                         help="Save the ASCII into an image file",
@@ -153,8 +164,9 @@ def main():
     image_file_path = validate_file_extension(args.image)
     image_file_path = validate_file_path(image_file_path)
     print(image_file_path)
-    ascii_img = handle_image_conversion(image_file_path)
-
+    ascii_key_path = args.key
+    print(ascii_key_path)
+    ascii_img = handle_image_conversion(image_file_path, ascii_key_path)
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)
     if args.saveimg:
