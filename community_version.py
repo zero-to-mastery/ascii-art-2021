@@ -7,8 +7,8 @@
 
 # 1. Clone this repo as it is!
 # 2. Open Terminal/cmd prompt, change the directory to the location of this repo
-# 3. Run the cmd 'python3 community_version.py -i image_file_path'
-# 4. Get the output on cmd window and checkout the saved text file too
+# 3. Run the cmd 'python3 community_version.py -i path/to/your_img -o path/to/file.txt -s path/to/img.png'
+# 4. Get the output on cmd window and checkout the saved text file and image file too
 # 5. To see what more the script can do with ascii, run: 'python3 community_version.py --help`
 
 # Note:
@@ -16,9 +16,8 @@
 # comment the contribution to make others understand easy (follow the best comment practices).
 
 import os
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageSequence
 import argparse
-import csv
 
 
 def get_ascii_key(akey_filepath):
@@ -74,14 +73,20 @@ def write_to_txtfile(image_txt, out_file):
         text_file.write(image_txt)
 
 
-def save_as_img(image_txt, out_file):
+def save_gif(out_file, ascii_frames, duration):
+    """Takes a list of image frames as input and combines and
+    save them all in form of a gif."""
+    ascii_frames[0].save(out_file, save_all=True,
+                         append_images=ascii_frames[1:], loop=0, duration=duration)
+
+
+def save_as_img(image_txt, out_file=None):
     """Takes the ASCII text as input, writes it to an image file and the saves
      it to the path inputted."""
 
-    # Make a blank white image.
     text_list = image_txt.split("\n")
 
-    """Every row takes 10px, so height should be len(text_list) * 10 and every
+    """Make a blank white image. Every row takes 10px, so height should be len(text_list) * 10 and every
      letter of a row takes 6px, so len(elements in a row) * 6 would get the
      correct width."""
     img = Image.new(
@@ -92,10 +97,30 @@ def save_as_img(image_txt, out_file):
         # Draws the text on the blank image.
         draw.text((0, (10 * i)), text_list[i], (0, 0, 0))
 
-    img.save(out_file)
+    if out_file:
+        img.save(out_file)
+
+    return img
 
 
-def handle_image_conversion(image_filepath , key_filepath):
+def gif_to_ascii_frames(gif, key):
+    """Extracts frames from the gif then converts them into ASCII img.
+    And reutrns all the ASCII frames and the duration of the gif."""
+
+    original_duration = gif.info["duration"]  # Get the duration of the gif.
+    # Extract all the frames.
+    frames = [frame.copy() for frame in ImageSequence.Iterator(gif)]
+    ascii_frames = []
+    for frame in frames:
+        """Convert extracted frames into ASCII frames with convert_image_to_ascii()
+        and convert them into img object with the help of save_as_img()
+        and append to ascii_frames."""
+        ascii_frames.append(save_as_img(convert_image_to_ascii(frame, key)))
+
+    return ascii_frames, original_duration
+
+
+def handle_image_conversion(image_filepath, key_filepath, is_gif=False):
     try:
         image = Image.open(image_filepath)
     except Exception as err:
@@ -103,7 +128,8 @@ def handle_image_conversion(image_filepath , key_filepath):
         print(err)
     else:
         key = key_filepath
-        return convert_image_to_ascii(image, key)
+        return (gif_to_ascii_frames(image, key) if is_gif else
+                convert_image_to_ascii(image, key))
 
 
 def validate_file_path(path):
@@ -125,7 +151,7 @@ def validate_file_extension(path):
         path = input('Enter a valid image path: ')
         validate_file_extension(path)
 
-    return path
+    return ext
 
 
 def _parse_args():
@@ -161,18 +187,25 @@ def _parse_args():
 
 def main():
     args = _parse_args()
-    image_file_path = validate_file_extension(args.image)
-    image_file_path = validate_file_path(image_file_path)
+    image_file_ext = validate_file_extension(args.image)
+    image_file_path = validate_file_path(args.image)
     print(image_file_path)
     ascii_key_path = args.key
     print(ascii_key_path)
-    ascii_img = handle_image_conversion(image_file_path, ascii_key_path)
-    if args.outfile:
-        write_to_txtfile(ascii_img, args.outfile)
-    if args.saveimg:
-        save_as_img(ascii_img, args.saveimg)
-    else:
+    ascii_img = (handle_image_conversion(image_file_path, ascii_key_path) if image_file_ext !=
+                 ".gif" else handle_image_conversion(image_file_path, ascii_key_path, is_gif=True))
+
+    if image_file_ext != ".gif":
+        if args.outfile:
+            write_to_txtfile(ascii_img, args.outfile)
+        if args.saveimg:
+            save_as_img(ascii_img, args.saveimg)
         print(ascii_img)
+    else:
+        if args.saveimg:
+            save_gif(args.saveimg, ascii_img[0], ascii_img[1])
+        if args.outfile:
+            raise Exception("Can't convert gif into txt file.")
 
 
 if __name__ == '__main__':
