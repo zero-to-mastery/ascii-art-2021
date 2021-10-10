@@ -7,13 +7,14 @@ from community_version import handle_image_conversion, is_supported, ALLOWED_EXT
 
 UPLOAD_FOLDER = './webapp/uploads'
 TXT_FOLDER = './webapp'
+KEY_FOLDER = './akey.txt'
 DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
 
 app = Flask(__name__)
 app.secret_key = "my-very-secret-key-pls"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['TXT_FOLDER'] = TXT_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024 # File max size set to 4MB
+app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # File max size set to 4MB
 
 
 @app.route('/')
@@ -33,7 +34,7 @@ def generate():
             path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
             file1.save(path)
 
-            ascii_image = handle_image_conversion(path)
+            ascii_image = handle_image_conversion(path, KEY_FOLDER)
             with open('./webapp/temp.txt', 'w') as f:
                 f.write(ascii_image)
 
@@ -47,7 +48,7 @@ def generate():
 
 @app.route('/ztm-logo.html')
 def show_ztm_logo_ascii_img():
-    image = handle_image_conversion(DEFAULT_IMAGE_PATH)
+    image = handle_image_conversion(DEFAULT_IMAGE_PATH, KEY_FOLDER)
     return render_template('ztm-logo.html', image=image)
 
 
