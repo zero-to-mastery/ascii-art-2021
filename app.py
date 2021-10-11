@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.utils import secure_filename
-from community_version import handle_image_conversion
+from community_version import handle_image_conversion, save_as_img
 
 UPLOAD_FOLDER = './webapp/uploads'
 TXT_FOLDER = './webapp'
@@ -47,12 +47,13 @@ def generate():
       return 'File must be a valid jpeg, png or jpg file'
 
 
-@app.route('/ztm-logo.html')
+@app.route('/ztm-logo.html', methods=['GET', 'POST'])
 def show_ztm_logo_ascii_img():
     DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
-    image = handle_image_conversion(DEFAULT_IMAGE_PATH,KEY_FOLDER)
-    return render_template('ztm-logo.html', image=image)
-
+    image_text = handle_image_conversion(DEFAULT_IMAGE_PATH,KEY_FOLDER)
+    if request.method == 'POST':
+      image = save_as_img(image_txt=image_text, out_file="saved_image.jpg")
+    return render_template('ztm-logo.html', image=image_text)
 
 if __name__ == '__main__':
   app.run(debug=True)
