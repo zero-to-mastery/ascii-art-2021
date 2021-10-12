@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <title>ZTM | Ascii Art</title>
+</head>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+  .navbar-brand {
+    font-weight: 600;
+  }
+</style>
+<body>
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#" style="display: flex; align-items: center;">
+        <img 
+          src="https://avatars.githubusercontent.com/u/35373879?s=280&v=4" 
+          alt="Logo" 
+          height="35px" 
+          class="d-inline-block align-text-top mx-4"
+        >
+        ZTM - Ascii Art
+      </a>
+    </div>
+  </nav>
+
+  <div class="container my-4"> 
+    <div class="jumbotron mt-4">
+      <h1 class="display-4">Ascii Art!</h1>
+      <p class="lead">This is web application which converts uploaded images into beutiful Ascii Art.</p>
+      <hr class="mt-4">
+      <p class="lead">
+        <a 
+          class="btn btn-primary btn-lg" 
+          href="https://github.com/zero-to-mastery/ascii-art-2021" 
+          role="button"
+          target="_blank"
+        >Learn more on Github</a>
+        <a href="./ztm-logo.html" class="btn btn-primary btn-lg">ZTM Logo</a>
+      </p>
+    </div>
+    
+    <div class="card">
+      <div class="card-body">
+        <form action="./generate" enctype="multipart/form-data" method="POST">
+          <!-- <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="out" aria-describedby="emailHelp">
+            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+          </div> -->
+
+          <!-- <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+            <label class="form-check-label" for="exampleCheck1">Check me out</label>
+          </div> -->
+
+          <div class="mb-3 form-group">
+            <label for="choosefile" class="form-label">Choose image file</label>
+            <input type="file" name="file1" id="choosefile" class="form-control" accept="image/*">
+          </div>
+
+          <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+      </div>
+    </div>
+
+  </div> <!--CONTAINER END-->
+</body>
+</html>
