@@ -22,15 +22,22 @@ import argparse
 # ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
 ASCII_CHARS = [ '#', '@', '$', '0', '+', '?', '!', '=', '&', ';', '-', '*', ':', '~', ',', '.']
 
+ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
+
+def get_ascii_key(akey_filepath):
+    """Pull a specific keyfile to index for ASCII rendering
+    """
+    with open(akey_filepath) as keyfile:
+        return list(keyfile.read().strip())
+
+
 def scale_image(image, new_width=100):
     """Resizes an image preserving the aspect ratio.
     """
     (original_width, original_height) = image.size
     aspect_ratio = original_height/float(original_width)
     new_height = int(aspect_ratio * new_width)
-
-    new_image = image.resize((new_width, new_height))
-    return new_image
+    return image.resize((new_width, new_height))
 
 
 def convert_to_grayscale(image):
@@ -40,21 +47,21 @@ def convert_to_grayscale(image):
 def map_pixels_to_ascii_chars(image, range_width=16):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
-    0-255 is divided into 16 ranges of 26 pixels each.
+    0-255 is divided into 16 ranges of 16 pixels each.
     """
-
+    ascii_key = get_ascii_key(key)
     pixels_in_image = list(image.getdata())
-    pixels_to_chars = [ASCII_CHARS[int(pixel_value / range_width)]
+    pixels_to_chars = [ascii_key[int(pixel_value / range_width)]
                        for pixel_value in pixels_in_image]
 
     return "".join(pixels_to_chars)
 
 
-def convert_image_to_ascii(image, new_width=100):
+def convert_image_to_ascii(image, key, new_width=100):
     image = scale_image(image)
     image = convert_to_grayscale(image)
 
-    pixels_to_chars = map_pixels_to_ascii_chars(image)
+    pixels_to_chars = map_pixels_to_ascii_chars(image, key)
     len_pixels_to_chars = len(pixels_to_chars)
 
     image_ascii = [pixels_to_chars[index: index + new_width]
@@ -89,14 +96,14 @@ def save_as_img(image_txt, out_file):
     img.save(out_file)
 
 
-def handle_image_conversion(image_filepath):
+def handle_image_conversion(image_filepath, key_filepath):
     try:
         image = Image.open(image_filepath)
     except Exception as err:
         print(f"Unable to open image file {image_filepath}.")
         print(err)
     else:
-        return convert_image_to_ascii(image)
+        return convert_image_to_ascii(image, key_filepath)
 
 
 def validate_file_path(path):
@@ -108,13 +115,19 @@ def validate_file_path(path):
     return path
 
 
-def validate_file_extension(path):
-    allowed_extensions = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
-    filename, ext = os.path.splitext(path)
+def is_supported(path: str) -> bool:
+    """
+    Checks if the given path is for a supported file.
+    It uses the file extension in the path and compares
+    it against ALLOWED_EXTENSIONS.
+    """
+    _, ext = os.path.splitext(path)
+    return ext[1:].lower() in set(ALLOWED_EXTENSIONS)
 
-    if ext[1:] not in allowed_extensions:
-        print(
-            f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
+
+def validate_file_extension(path):
+    if not is_supported(path):
+        print(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
         path = input('Enter a valid image path: ')
         validate_file_extension(path)
 
@@ -126,12 +139,11 @@ def _parse_args():
     Parses command-line arguments.
 
     The function returns an object that has the added arguments as attributes.
-    To add a new argument, add another entry of 'parser.add_argument(...)' 
+    To add a new argument, add another entry of 'parser.add_argument(...)'
     and specify the details you want.
     The docs for argparse are at: https://docs.python.org/3/library/argparse.html
     """
-    parser = argparse.ArgumentParser(
-        description="Converts images into ASCII art.")
+    parser = argparse.ArgumentParser(description="Converts images into ASCII art.")
     parser.add_argument("-i", "--image",
                         help="File path to input image (default: %(default)s)",
                         default="./example/ztm-logo.png",
@@ -139,6 +151,10 @@ def _parse_args():
     parser.add_argument("-o", "--outfile",
                         help="write the ASCII into this file instead of the default STDOUT",
                         nargs="?",
+                        action="store")
+    parser.add_argument("-k", "--key",
+                        help="Key of ASCII characters to use in rendering",
+                        default="./akey.txt",
                         action="store")
     parser.add_argument("-s", "--saveimg",
                         help="Save the ASCII into an image file",
@@ -153,8 +169,9 @@ def main():
     image_file_path = validate_file_extension(args.image)
     image_file_path = validate_file_path(image_file_path)
     print(image_file_path)
-    ascii_img = handle_image_conversion(image_file_path)
-
+    ascii_key_path = args.key
+    print(ascii_key_path)
+    ascii_img = handle_image_conversion(image_file_path, ascii_key_path)
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)
     if args.saveimg:
