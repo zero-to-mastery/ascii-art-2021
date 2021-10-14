@@ -44,7 +44,7 @@ def convert_to_grayscale(image):
     return image.convert('L')
 
 
-def map_pixels_to_ascii_chars(image, range_width=16):
+def map_pixels_to_ascii_chars(image, key, range_width=16):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
     0-255 is divided into 16 ranges of 16 pixels each.
