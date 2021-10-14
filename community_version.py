@@ -19,6 +19,9 @@ import os
 from PIL import Image, ImageDraw
 import argparse
 
+# ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
+# ASCII_CHARS = [ '#', '@', '$', '0', '+', '?', '!', '=', '&', ';', '-', '*', ':', '~', ',', '.']
+
 ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
 
 def get_ascii_key(akey_filepath):
@@ -41,10 +44,10 @@ def convert_to_grayscale(image):
     return image.convert('L')
 
 
-def map_pixels_to_ascii_chars(image, key, range_width=25):
+def map_pixels_to_ascii_chars(image, key, range_width=16):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
-    0-255 is divided into 11 ranges of 25 pixels each.
+    0-255 is divided into 16 ranges of 16 pixels each.
     """
     ascii_key = get_ascii_key(key)
     pixels_in_image = list(image.getdata())
