@@ -43,7 +43,7 @@ if __name__ == '__main__':
         root, 
         text="Image to ASCII Converter", 
         fg="black",
-        font=("Times", 25, "bold"), 
+        font=("Times", 25, 'bold'), 
         width=25, 
         pady=5, 
         padx=25
