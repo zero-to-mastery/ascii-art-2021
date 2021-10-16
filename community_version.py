@@ -18,8 +18,11 @@
 import os
 from PIL import Image, ImageDraw
 import argparse
-import csv
 
+# ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
+# ASCII_CHARS = [ '#', '@', '$', '0', '+', '?', '!', '=', '&', ';', '-', '*', ':', '~', ',', '.']
+
+ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
 
 def get_ascii_key(akey_filepath):
     """Pull a specific keyfile to index for ASCII rendering
@@ -34,19 +37,17 @@ def scale_image(image, new_width=100):
     (original_width, original_height) = image.size
     aspect_ratio = original_height/float(original_width)
     new_height = int(aspect_ratio * new_width)
-
-    new_image = image.resize((new_width, new_height))
-    return new_image
+    return image.resize((new_width, new_height))
 
 
 def convert_to_grayscale(image):
     return image.convert('L')
 
 
-def map_pixels_to_ascii_chars(image, key, range_width=25):
+def map_pixels_to_ascii_chars(image, key, range_width=16):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
-    0-255 is divided into 11 ranges of 25 pixels each.
+    0-255 is divided into 16 ranges of 16 pixels each.
     """
     ascii_key = get_ascii_key(key)
     pixels_in_image = list(image.getdata())
@@ -95,15 +96,14 @@ def save_as_img(image_txt, out_file):
     img.save(out_file)
 
 
-def handle_image_conversion(image_filepath , key_filepath):
+def handle_image_conversion(image_filepath, key_filepath):
     try:
         image = Image.open(image_filepath)
     except Exception as err:
         print(f"Unable to open image file {image_filepath}.")
         print(err)
     else:
-        key = key_filepath
-        return convert_image_to_ascii(image, key)
+        return convert_image_to_ascii(image, key_filepath)
 
 
 def validate_file_path(path):
@@ -115,13 +115,19 @@ def validate_file_path(path):
     return path
 
 
-def validate_file_extension(path):
-    allowed_extensions = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
-    filename, ext = os.path.splitext(path)
+def is_supported(path: str) -> bool:
+    """
+    Checks if the given path is for a supported file.
+    It uses the file extension in the path and compares
+    it against ALLOWED_EXTENSIONS.
+    """
+    _, ext = os.path.splitext(path)
+    return ext[1:].lower() in set(ALLOWED_EXTENSIONS)
 
-    if ext[1:] not in allowed_extensions:
-        print(
-            f"Invalid extension: {ext}. Make sure it is one of {', '.join(allowed_extensions)}.")
+
+def validate_file_extension(path):
+    if not is_supported(path):
+        print(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
         path = input('Enter a valid image path: ')
         validate_file_extension(path)
 
@@ -137,8 +143,7 @@ def _parse_args():
     and specify the details you want.
     The docs for argparse are at: https://docs.python.org/3/library/argparse.html
     """
-    parser = argparse.ArgumentParser(
-        description="Converts images into ASCII art.")
+    parser = argparse.ArgumentParser(description="Converts images into ASCII art.")
     parser.add_argument("-i", "--image",
                         help="File path to input image (default: %(default)s)",
                         default="./example/ztm-logo.png",
