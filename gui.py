@@ -9,7 +9,7 @@ import sys
 
 
 from community_version import write_to_txtfile, handle_image_conversion
-
+KEYFILE = './akey.txt'  # Future improvement includes adding keyfile selection through app
 
 def main():
     global entry1
@@ -17,7 +17,7 @@ def main():
         image_file_path = sys.argv[1]
     except IndexError:
         image_file_path = entry1.get()
-    ascii_img = handle_image_conversion(image_file_path)
+    ascii_img = handle_image_conversion(image_file_path, KEYFILE)
     print(ascii_img)
 #     write_to_txtfile(ascii_img, "output.txt")
 #     success.config(
