@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.utils import secure_filename
 
-from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS
+from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS, save_as_img
 
 UPLOAD_FOLDER = './webapp/uploads'
 TXT_FOLDER = './webapp'
@@ -46,10 +46,14 @@ def generate():
             return f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}"
 
 
-@app.route('/ztm-logo.html')
+@app.route('/ztm-logo.html', methods=['GET', 'POST'])
 def show_ztm_logo_ascii_img():
-    image = handle_image_conversion(DEFAULT_IMAGE_PATH, KEY_FOLDER)
-    return render_template('ztm-logo.html', image=image)
+    text_image = handle_image_conversion(DEFAULT_IMAGE_PATH, KEY_FOLDER)
+    #form request
+    if request.method == 'POST':
+        image = save_as_img(text_image, 'ztm-logo-ascii.png')
+
+    return render_template('ztm-logo.html', image=text_image)
 
 
 if __name__ == '__main__':
