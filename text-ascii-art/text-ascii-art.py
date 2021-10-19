@@ -4,23 +4,22 @@
 # Command-line arguments:
 #     -text: text to be printed. Defaults to "ZTM" if not specified.
 #     -font: index of the font you want to use. Defaults to "standard" if not specified.
+#     -color: text color. Defaults to "None" if not specified.
+#     -attrs: attributes (comma-separated) used for the style. Defaults to "None" if not specified.
 # Examples:
 # python text-ascii-art.py
 # python text-ascii-art.py -text "ZTM" -font 21
 # python text-ascii-art.py -text "ASCII ART" -font 16
 # python text-ascii-art.py -text "Python3" -font standard
+# python text-ascii-art.py -text "Bold" -font standard -attrs bold,underline
 # python text-ascii-art.py -text "ZTM" -font isometric3 -color green
-import logging
+# python text-ascii-art.py -text "Colorama" -font isometric3 -color red -attrs bold
 
 import pyfiglet
 import argparse
 import termcolor, colorama
 
-from logger_config import LOGGING_CONFIG
-
 colorama.init()
-logging.config.dictConfig(LOGGING_CONFIG)
-logger = logging.getLogger(__name__)
 
 fonts_list = ['standard', '3-d', '5lineoblique', '6x10', '6x9', 'acrobatic', 'arrows', 'ascii___',
 'avatar', 'banner', 'banner3-D', 'banner3', 'banner4', 'big', 'block',
@@ -28,6 +27,8 @@ fonts_list = ['standard', '3-d', '5lineoblique', '6x10', '6x9', 'acrobatic', 'ar
 'nancyj-underlined', 'smkeyboard', 'univers']
 
 colors_list = ['grey', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
+attrs_list = ['bold', 'dark', 'underline', 'blink', 'reverse', 'concealed']
+attrs_valid = []
 
 def font_checker(fonts_list, fc=None):
     if not isinstance(fc, int):
@@ -62,6 +63,21 @@ def validate_color(color):
 
     return color
 
+def validate_attrs(attrs):
+    global attrs_list
+    global attrs_valid
+    
+    if attrs is not None:
+      for attr in attrs:
+        if attr not in attrs_list:
+            print(f"Invalid attribute: {attr}.")
+            print(f"Choose one of {', '.join(attrs_list)}.")
+            attr = input("Please enter an attribute: ")
+            attr = validate_attrs(attr.split(","))
+        else:
+          attrs_valid.append(attr)
+    
+    return attrs_valid    
 
 # Create the parser
 parser = argparse.ArgumentParser()
@@ -70,7 +86,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-text', required=False)
 parser.add_argument('-font', required=False)
 parser.add_argument('-color', required=False)
-
+parser.add_argument('-attrs', required=False)
 
 args = parser.parse_args()
 
@@ -79,6 +95,9 @@ text = getattr(args, 'text') or input("Please enter the text you want to print: 
 font = getattr(args, 'font') or font_checker(fonts_list)
 
 color = getattr(args, 'color')
+attrs = (getattr(args, 'attrs'))
+if attrs is not None:
+  attrs = attrs.split(',')
 
 if font not in fonts_list:
     try:
@@ -88,13 +107,14 @@ if font not in fonts_list:
         else:
             font = font_checker(fonts_list)
     except ValueError:
-        logger.error("Sorry, this font is not available")
+        print("Sorry, this font is not available")
         font = font_checker(fonts_list)
 
 fig = pyfiglet.figlet_format(text, font=font)
 
 if color is not None:
     color = validate_color(color)
-    print(termcolor.colored(fig, color))
-else:
-    print(fig)
+if attrs is not None:
+    attrs = validate_attrs(attrs)
+
+print(termcolor.colored(fig, color, attrs=attrs))
