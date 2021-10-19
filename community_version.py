@@ -11,18 +11,24 @@
 # 4. Get the output on cmd window and checkout the saved text file too
 # 5. To see what more the script can do with ascii, run: 'python3 community_version.py --help`
 
+import argparse
 # Note:
 # Please change the instructions according to the fix or features contributed code.
 # comment the contribution to make others understand easy (follow the best comment practices).
-
+import logging.config
 import os
+
 from PIL import Image, ImageDraw
+
+from logger_config import LOGGING_CONFIG
+
 import argparse
 
 # ASCII_CHARS = ['#', '?', '%', '.', 'S', '+', '.', '*', ':', ',', '@']
 # ASCII_CHARS = [ '#', '@', '$', '0', '+', '?', '!', '=', '&', ';', '-', '*', ':', '~', ',', '.']
 
 ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
+
 
 def get_ascii_key(akey_filepath):
     """Pull a specific keyfile to index for ASCII rendering
@@ -31,11 +37,15 @@ def get_ascii_key(akey_filepath):
         return list(keyfile.read().strip())
 
 
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger(__name__)
+
+
 def scale_image(image, new_width=100):
     """Resizes an image preserving the aspect ratio.
     """
     (original_width, original_height) = image.size
-    aspect_ratio = original_height/float(original_width)
+    aspect_ratio = original_height / float(original_width)
     new_height = int(aspect_ratio * new_width)
     return image.resize((new_width, new_height))
 
@@ -58,6 +68,7 @@ def map_pixels_to_ascii_chars(image, key, range_width=16):
 
 
 def convert_image_to_ascii(image, key, new_width=100):
+    logger.info("Converting the image to ascii")
     image = scale_image(image)
     image = convert_to_grayscale(image)
 
@@ -67,6 +78,7 @@ def convert_image_to_ascii(image, key, new_width=100):
     image_ascii = [pixels_to_chars[index: index + new_width]
                    for index in range(0, len_pixels_to_chars, new_width)]
 
+    logger.info("Successfully converted the image to ascii")
     return "\n".join(image_ascii)
 
 
@@ -100,16 +112,16 @@ def handle_image_conversion(image_filepath, key_filepath):
     try:
         image = Image.open(image_filepath)
     except Exception as err:
-        print(f"Unable to open image file {image_filepath}.")
-        print(err)
+        logger.error(f"Unable to open image file {image_filepath}.")
+        logger.error(err)
     else:
         return convert_image_to_ascii(image, key_filepath)
 
 
 def validate_file_path(path):
     if not os.path.isfile(path):
-        print(f'Invalid input. Could not find file at "{path}".')
-        print('A test image is located at "example/ztm-logo.png"')
+        logger.error(f'Invalid input. Could not find file at "{path}".')
+        logger.info('A test image is located at "example/ztm-logo.png"')
         path = input('Enter a valid file path: ')
         validate_file_path(path)
     return path
@@ -127,9 +139,9 @@ def is_supported(path: str) -> bool:
 
 def validate_file_extension(path):
     if not is_supported(path):
-        print(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
-        path = input('Enter a valid image path: ')
-        validate_file_extension(path)
+        logger.error(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
+    path = input('Enter a valid image path: ')
+    validate_file_extension(path)
 
     return path
 
@@ -168,9 +180,9 @@ def main():
     args = _parse_args()
     image_file_path = validate_file_extension(args.image)
     image_file_path = validate_file_path(image_file_path)
-    print(image_file_path)
+    logger.info(image_file_path)
     ascii_key_path = args.key
-    print(ascii_key_path)
+    logger.info(ascii_key_path)
     ascii_img = handle_image_conversion(image_file_path, ascii_key_path)
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)

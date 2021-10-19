@@ -10,12 +10,17 @@
 # python text-ascii-art.py -text "ASCII ART" -font 16
 # python text-ascii-art.py -text "Python3" -font standard
 # python text-ascii-art.py -text "ZTM" -font isometric3 -color green
+import logging
 
 import pyfiglet
 import argparse
 import termcolor, colorama
 
+from logger_config import LOGGING_CONFIG
+
 colorama.init()
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger(__name__)
 
 fonts_list = ['standard', '3-d', '5lineoblique', '6x10', '6x9', 'acrobatic', 'arrows', 'ascii___',
 'avatar', 'banner', 'banner3-D', 'banner3', 'banner4', 'big', 'block',
@@ -83,7 +88,7 @@ if font not in fonts_list:
         else:
             font = font_checker(fonts_list)
     except ValueError:
-        print("Sorry, this font is not available")
+        logger.error("Sorry, this font is not available")
         font = font_checker(fonts_list)
 
 fig = pyfiglet.figlet_format(text, font=font)
