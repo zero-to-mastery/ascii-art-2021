@@ -164,6 +164,32 @@ def _parse_args():
     return parser.parse_args()
 
 
+def modify(image, buckets=25):
+    '''
+    method modify():
+        - replaces every pixel with a character whose intensity is similar
+    '''
+    initial_pixels = list(image.getdata())
+    new_pixels = [ASCII_CHARS[pixel_value//buckets] for pixel_value in initial_pixels]
+    return ''.join(new_pixels)
+
+
+def do(image, new_width=100):
+    '''
+    method do():
+        - does all the work by calling all the above functions
+    '''
+    image = scale_image(image)
+    image = convert_to_grayscale(image)
+
+    pixels = modify(image)
+    len_pixels = len(pixels)
+
+    # Construct the image from the character list
+    new_image = [pixels[index:index+new_width] for index in range(0, len_pixels, new_width)]
+
+    return '\n'.join(new_image)
+
 def main():
     args = _parse_args()
     image_file_path = validate_file_extension(args.image)
