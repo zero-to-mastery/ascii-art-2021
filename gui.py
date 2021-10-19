@@ -31,8 +31,13 @@ def main():
         image_file_path = sys.argv[1]
     except IndexError:
         image_file_path = path_entry.get()
-    ascii_img = handle_image_conversion(image_file_path, KEYFILE)
-    print(ascii_img)
+
+    if not image_file_path:
+        print('Image not selected.')
+        return
+
+    if ascii_img := handle_image_conversion(image_file_path, KEYFILE):
+        print(ascii_img)
 
 
 if __name__ == '__main__':
