@@ -35,6 +35,7 @@ if __name__ == '__main__':
         global entry1
         tempdir = filedialog.askopenfilename(parent=root, filetypes=(
             ('png files', '*.png'), ('jpeg files', '*.jpg'), ('all files', '*.*')), title='Please select a file')
+        entry1.delete(0, last=tk.END)
         entry1.insert(tk.END, tempdir)
 
     Label(root, text="Image to ASCII Converter", fg="black",
