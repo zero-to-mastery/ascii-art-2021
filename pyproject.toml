@@ -9,6 +9,8 @@ python = "^3.9"
 Pillow = "^8.3.2"
 pyfiglet = "^0.8.post1"
 Flask = "^2.0.2"
+colorama = "^0.4.4"
+termcolor = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
 
