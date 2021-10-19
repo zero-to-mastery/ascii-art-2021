@@ -21,6 +21,7 @@ def browse_pic(parent):
     tempdir = filedialog.askopenfilename(parent=parent,
                                          filetypes=FILE_TYPES,
                                          title='Please select a file')
+    path_entry.delete(0, last=tk.END)
     path_entry.insert(tk.END, tempdir)
 
 
