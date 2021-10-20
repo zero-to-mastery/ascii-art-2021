@@ -1,19 +1,21 @@
 import os
 
 from flask import Flask, render_template, request, send_from_directory
-from werkzeug.utils import secure_filename
+from werkzeug.utils import redirect, secure_filename
 
 from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS, save_as_img
 
 UPLOAD_FOLDER = './webapp/uploads'
 TXT_FOLDER = './webapp'
 KEY_FOLDER = './akey.txt'
+ASCII_IMAGE_FOLDER = './'
 DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
 
 app = Flask(__name__)
 app.secret_key = "my-very-secret-key-pls"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['TXT_FOLDER'] = TXT_FOLDER
+app.config['ASCII_IMAGE_FOLDER'] = ASCII_IMAGE_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # File max size set to 4MB
 
 
@@ -52,7 +54,10 @@ def show_ztm_logo_ascii_img():
     #form request
     if request.method == 'POST':
         image = save_as_img(text_image, 'ztm-logo-ascii.png')
+        return send_from_directory(app.config['ASCII_IMAGE_FOLDER'], 'ztm-logo-ascii.png', as_attachment=True)
 
+    if os.path.exists('ztm-logo-ascii.png'):
+        os.remove('ztm-logo-ascii.png')
     return render_template('ztm-logo.html', image=text_image)
 
 
