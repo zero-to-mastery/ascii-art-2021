@@ -68,7 +68,7 @@ def map_pixels_to_ascii_chars(image, key, range_width=16):
 
 
 def convert_image_to_ascii(image, key, new_width=100):
-    logger.info("Converting the image to ascii")
+    logger.debug("Converting the image to ascii")
     image = scale_image(image)
     image = convert_to_grayscale(image)
 
@@ -78,16 +78,19 @@ def convert_image_to_ascii(image, key, new_width=100):
     image_ascii = [pixels_to_chars[index: index + new_width]
                    for index in range(0, len_pixels_to_chars, new_width)]
 
-    logger.info("Successfully converted the image to ascii")
+    logger.debug("Successfully converted the image to ascii")
     return "\n".join(image_ascii)
 
 
 def write_to_txtfile(image_txt, out_file):
+    logger.debug("Saving ASCII into specified text file")
     with open(out_file, "w") as text_file:
         text_file.write(image_txt)
+    logger.debug("Successfully Saved ASCII into text file")
 
 
 def save_as_img(image_txt, out_file):
+    logger.debug("Saving ASCII into specified image file")
     """Takes the ASCII text as input, writes it to an image file and the saves
      it to the path inputted."""
 
@@ -106,24 +109,27 @@ def save_as_img(image_txt, out_file):
         draw.text((0, (10 * i)), text_list[i], (0, 0, 0))
 
     img.save(out_file)
+    logger.debug("Successfully saved ASCII into specified image file")
 
 
-def handle_image_conversion(image_filepath, key_filepath):
+def handle_image_conversion(image_file_path, key_file_path):
     try:
-        image = Image.open(image_filepath)
+        image = Image.open(image_file_path)
     except Exception as err:
-        logger.error(f"Unable to open image file {image_filepath}.")
+        print(f"Unable to open image file {image_file_path}.")
         logger.error(err)
     else:
-        return convert_image_to_ascii(image, key_filepath)
+        return convert_image_to_ascii(image, key_file_path)
 
 
 def validate_file_path(path):
+    logger.debug("Validating the file path")
     if not os.path.isfile(path):
-        logger.error(f'Invalid input. Could not find file at "{path}".')
-        logger.info('A test image is located at "example/ztm-logo.png"')
+        print(f'Invalid input. Could not find file at "{path}".')
+        print('A test image is located at "example/ztm-logo.png"')
         path = input('Enter a valid file path: ')
         validate_file_path(path)
+    logger.debug("Successfully Validated the file path")
     return path
 
 
@@ -138,11 +144,12 @@ def is_supported(path: str) -> bool:
 
 
 def validate_file_extension(path):
+    logger.debug("Validating the file extension of input file")
     if not is_supported(path):
-        logger.error(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
-    path = input('Enter a valid image path: ')
-    validate_file_extension(path)
-
+        print(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
+        path = input('Enter a valid image path: ')
+        validate_file_extension(path)
+    logger.debug("Successfully Validated the file extension of input file")
     return path
 
 
