@@ -3,7 +3,7 @@
 
 # [![ASCII ART](https://img.shields.io/badge/PYTHON%20PROJECT-ASCII%20ART-blue?style=for-the-badge&logo=Python)](https://github.com/zero-to-mastery/ascii-art-2021)
 
-Welcome to this years Python challenge for Hacktoberfest ([What is Hacktoberfest?](https://github.com/zero-to-mastery/coding_challenge-42/blob/master/README.md#what-is-hacktoberfest)) A project with beginners and aspiring developers in mind, utilizing Python to convert images into ASCII Art.
+Welcome to this year's Python challenge for Hacktoberfest ([What is Hacktoberfest?](https://github.com/zero-to-mastery/coding_challenge-42/blob/master/README.md#what-is-hacktoberfest)) A project with beginners and aspiring developers in mind, utilizing Python to convert images into ASCII Art.
 
 
 ## ❇️ Getting Started with Hacktoberfest
@@ -45,10 +45,10 @@ Now that you see how this command line tool works, let's see how we can evolve i
 
 The options are endless and there is no wrong answer. This is all for fun, so try to customize the tool whichever way you think would be best and let's see what we get at the end of the month! Enjoy! 
 
-> ⚠ Please do **not** make changed to the files in the example directory, These files should remain intact for future contributors to examine and compare with the community version! Pull requests with changes to these files will be closed, requesting the changes to be reverted. 
+> ⚠ Please do **not** make changes to the files in the example directory, These files should remain intact for future contributors to examine and compare with the community version! Pull requests with changes to these files will be closed, requesting the changes to be reverted. 
 
 1. Examine the code in `community-version.py`, figure out what improvements your fellow community members have made. 
-2. Make an improvement, it doesnt have to be elaborate
+2. Make an improvement, it doesn't have to be elaborate
 3. Create a pull request
 4. [Tweet about making your first Hacktoberfest pull request](https://ctt.ac/UR9dA)
 
