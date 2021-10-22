@@ -140,8 +140,8 @@ def is_supported(path: str) -> bool:
 def validate_file_extension(path):
     if not is_supported(path):
         logger.error(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
-    path = input('Enter a valid image path: ')
-    validate_file_extension(path)
+        path = input('Enter a valid image path: ')
+        validate_file_extension(path)
 
     return path
 
