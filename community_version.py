@@ -90,7 +90,9 @@ def write_to_txtfile(image_txt, out_file):
 def save_as_img(image_txt, out_file):
     """Takes the ASCII text as input, writes it to an image file and the saves
      it to the path inputted."""
-
+    if os.path.isfile(out_file):
+        logger.error(f"{out_file} already exists.")
+        return
     # Make a blank white image.
     text_list = image_txt.split("\n")
 
@@ -104,9 +106,11 @@ def save_as_img(image_txt, out_file):
     for i in range(len(text_list)):
         # Draws the text on the blank image.
         draw.text((0, (10 * i)), text_list[i], (0, 0, 0))
-
-    img.save(out_file)
-
+    try:
+        img.save(out_file)
+    except ValueError as err:
+        logger.error(err)
+        logger.info(f"Enter a valid path with a valid file extension.\nAllowed Extensions: {', '.join(ALLOWED_EXTENSIONS)}")
 
 def handle_image_conversion(image_filepath, key_filepath):
     try:
