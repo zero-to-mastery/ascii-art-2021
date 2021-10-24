@@ -139,7 +139,8 @@ def is_supported(path: str) -> bool:
 
 def validate_file_extension(path):
     if not is_supported(path):
-        logger.error(f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
+        logger.error(
+            f"File not supported. Make sure it is one of {', '.join(ALLOWED_EXTENSIONS)}.")
         path = input('Enter a valid image path: ')
         validate_file_extension(path)
 
@@ -155,7 +156,8 @@ def _parse_args():
     and specify the details you want.
     The docs for argparse are at: https://docs.python.org/3/library/argparse.html
     """
-    parser = argparse.ArgumentParser(description="Converts images into ASCII art.")
+    parser = argparse.ArgumentParser(
+        description="Converts images into ASCII art.")
     parser.add_argument("-i", "--image",
                         help="File path to input image (default: %(default)s)",
                         default="./example/ztm-logo.png",
@@ -186,7 +188,7 @@ def main():
     ascii_img = handle_image_conversion(image_file_path, ascii_key_path)
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)
-    if args.saveimg:
+    elif args.saveimg:
         save_as_img(ascii_img, args.saveimg)
     else:
         print(ascii_img)
