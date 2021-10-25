@@ -10,7 +10,8 @@ from community_version import handle_image_conversion, ALLOWED_EXTENSIONS
 
 # todo: Add keyfile selection through app
 KEYFILE = './akey.txt'
-FILE_TYPES = [(f'{ext.upper()} Files', f'*.{ext}') for ext in ALLOWED_EXTENSIONS] + [('All Files', '*.*')]
+FILE_TYPES = [(f'{ext.upper()} Files', f'*.{ext}')
+              for ext in ALLOWED_EXTENSIONS] + [('All Files', '*.*')]
 
 
 def browse_pic(parent):
@@ -37,6 +38,12 @@ def main():
         return
 
     if ascii_img := handle_image_conversion(image_file_path, KEYFILE):
+        # f = open('ascii_img.txt', 'w')
+        # adding saving the ascii img converted txt file feature using tkinter ... -Sahil Lotya
+        f = filedialog.asksaveasfile(initialfile="ascii_img", defaultextension=".txt", filetypes=[
+            ("All Files", "*.*"), ("Text Documents", "*.txt")])
+        f.write(ascii_img)
+        f.close()
         print(ascii_img)
 
 
@@ -50,7 +57,8 @@ if __name__ == '__main__':
     Label(root, text="Image to ASCII Converter", fg="black", font=("Times", 25, "bold"),
           width=25, pady=5, padx=25).pack()
 
-    label1 = Label(root, text="Please enter the file path or choose a file:", fg="white", bg='black', font=20)
+    label1 = Label(root, text="Please enter the file path or choose a file:",
+                   fg="white", bg='black', font=20)
     label1.place(x=140, y=100)
 
     path_entry = Entry(root, bd=5, font=15, width=60)
@@ -62,7 +70,8 @@ if __name__ == '__main__':
                         command=lambda: browse_pic(root))
     browse_btn.place(x=705, y=140)
 
-    convrt_btn = Button(root, text="Convert", font=("Arial", 20), width=10, padx=5, pady=5, command=main)
+    convrt_btn = Button(root, text="Convert", font=(
+        "Arial", 20), width=10, padx=5, pady=5, command=main)
     convrt_btn.place(x=340, y=180)
 
     success = Label(root, text='', bg='black')
