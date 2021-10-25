@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, send_from_directory,redirect
+from flask import Flask, render_template, request, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
 
 from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS, save_as_img
@@ -44,7 +44,7 @@ def generate():
 
         else:
             return f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}"
-    return redirect('/')
+    return url_for('get_index')
 
 
 @app.route('/ztm-logo.html', methods=['GET', 'POST'])
