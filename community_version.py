@@ -18,7 +18,7 @@ import argparse
 import logging.config
 import os
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 
 from logger_config import LOGGING_CONFIG
 
@@ -112,13 +112,15 @@ def save_as_img(image_txt, out_file):
     logger.debug("Successfully saved ASCII into specified image file")
 
 
-def handle_image_conversion(image_file_path, key_file_path):
+def handle_image_conversion(image_file_path, key_file_path, mirror=False):
     try:
         image = Image.open(image_file_path)
     except Exception as err:
         print(f"Unable to open image file {image_file_path}.")
         logger.error(err)
     else:
+        if mirror:
+            image= ImageOps.mirror(image)
         return convert_image_to_ascii(image, key_file_path)
 
 
@@ -179,18 +181,24 @@ def _parse_args():
                         help="Save the ASCII into an image file",
                         nargs="?",
                         action="store")
+    parser.add_argument("-m", "--mirror",
+                        help="Mirror image horizontally",
+                        action="store_true")
 
     return parser.parse_args()
 
 
 def main():
     args = _parse_args()
+    mirror = False
+    if args.mirror:
+        mirror = True
     image_file_path = validate_file_extension(args.image)
     image_file_path = validate_file_path(image_file_path)
     logger.info(image_file_path)
     ascii_key_path = args.key
     logger.info(ascii_key_path)
-    ascii_img = handle_image_conversion(image_file_path, ascii_key_path)
+    ascii_img = handle_image_conversion(image_file_path, ascii_key_path, mirror)
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)
     if args.saveimg:
