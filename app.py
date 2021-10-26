@@ -1,5 +1,4 @@
 import os
-import pathlib
 
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.utils import redirect, secure_filename
@@ -11,7 +10,6 @@ TXT_FOLDER = './webapp'
 KEY_FOLDER = './akey.txt'
 ASCII_IMAGE_FOLDER = './webapp'
 DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
-pathlib.Path(UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__)
 app.secret_key = "my-very-secret-key-pls"
@@ -29,7 +27,6 @@ def convert_image(path):
 
 @app.route('/')
 def get_index():
-    #text_image = handle_image_conversion(DEFAULT_IMAGE_PATH, KEY_FOLDER)
     return render_template('index.html', image = convert_image(DEFAULT_IMAGE_PATH), filename = DEFAULT_IMAGE_PATH)
 
 
@@ -37,7 +34,7 @@ def get_index():
 def generate():
     if request.method == 'POST':
         if ('file1' not in request.files) or (request.files['file1'].filename == ''):
-            return 'No valid file found' #?Put this as an error message on main page.
+            return 'No valid file found'
 
         file1 = request.files['file1']
 
