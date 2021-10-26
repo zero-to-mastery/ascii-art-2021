@@ -5,9 +5,9 @@ from werkzeug.utils import redirect, secure_filename
 
 from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS, save_as_img
 
-UPLOAD_FOLDER = './webapp/uploads'
-TXT_FOLDER = './webapp'
-KEY_FOLDER = './akey.txt'
+UPLOAD_FOLDER = 'webapp/uploads/'
+TXT_FOLDER = 'webapp'
+KEY_FOLDER = 'akey.txt'
 ASCII_IMAGE_FOLDER = './'
 DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
 
@@ -32,10 +32,19 @@ def generate():
 
         file1 = request.files['file1']
 
-        if file1 and is_supported(file1.filename):
-            path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
-            file1.save(path)
-
+        if file1 and is_supported(file1.filename): 
+            directory_path = os.path.join(app.config['UPLOAD_FOLDER'])
+            
+            #if os path exists, directly saves temp text
+            if os.path.exists(directory_path):
+                path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+                file1.save(path)
+            
+            #else, creates directory and then saves temp text
+            else:
+                os.makedirs(directory_path) 
+                path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+                file1.save(path)
             ascii_image = handle_image_conversion(path, KEY_FOLDER)
             with open('./webapp/temp.txt', 'w') as f:
                 f.write(ascii_image)
