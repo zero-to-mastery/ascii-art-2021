@@ -93,7 +93,9 @@ def save_as_img(image_txt, out_file):
     logger.debug("Saving ASCII into specified image file")
     """Takes the ASCII text as input, writes it to an image file and the saves
      it to the path inputted."""
-
+    if os.path.isfile(out_file):
+        logger.error(f"{out_file} already exists.")
+        return
     # Make a blank white image.
     text_list = image_txt.split("\n")
 
@@ -108,8 +110,12 @@ def save_as_img(image_txt, out_file):
         # Draws the text on the blank image.
         draw.text((0, (10 * i)), text_list[i], (0, 0, 0))
 
-    img.save(out_file)
-    logger.debug("Successfully saved ASCII into specified image file")
+    try:
+        img.save(out_file)
+        logger.debug("Successfully saved ASCII into specified image file")
+    except ValueError as err:
+        logger.error(err)
+        logger.info(f"Enter a valid path with a valid file extension.\nAllowed Extensions: {', '.join(ALLOWED_EXTENSIONS)}")
 
 
 def handle_image_conversion(image_file_path, key_file_path):
