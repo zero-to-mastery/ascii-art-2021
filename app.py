@@ -55,6 +55,7 @@ def generate():
 
         else:
             return f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}"
+    
 
 
 @app.route('/ztm-logo.html', methods=['GET', 'POST'])
