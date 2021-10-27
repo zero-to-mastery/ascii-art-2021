@@ -18,7 +18,7 @@ import argparse
 import logging.config
 import os
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 
 from logger_config import LOGGING_CONFIG
 
@@ -93,7 +93,9 @@ def save_as_img(image_txt, out_file):
     logger.debug("Saving ASCII into specified image file")
     """Takes the ASCII text as input, writes it to an image file and the saves
      it to the path inputted."""
-
+    if os.path.isfile(out_file):
+        logger.error(f"{out_file} already exists.")
+        return
     # Make a blank white image.
     text_list = image_txt.split("\n")
 
@@ -108,17 +110,23 @@ def save_as_img(image_txt, out_file):
         # Draws the text on the blank image.
         draw.text((0, (10 * i)), text_list[i], (0, 0, 0))
 
-    img.save(out_file)
-    logger.debug("Successfully saved ASCII into specified image file")
+    try:
+        img.save(out_file)
+        logger.debug("Successfully saved ASCII into specified image file")
+    except ValueError as err:
+        logger.error(err)
+        logger.info(f"Enter a valid path with a valid file extension.\nAllowed Extensions: {', '.join(ALLOWED_EXTENSIONS)}")
 
 
-def handle_image_conversion(image_file_path, key_file_path):
+def handle_image_conversion(image_file_path, key_file_path, mirror=False):
     try:
         image = Image.open(image_file_path)
     except Exception as err:
         print(f"Unable to open image file {image_file_path}.")
         logger.error(err)
     else:
+        if mirror:
+            image= ImageOps.mirror(image)
         return convert_image_to_ascii(image, key_file_path)
 
 
@@ -179,18 +187,24 @@ def _parse_args():
                         help="Save the ASCII into an image file",
                         nargs="?",
                         action="store")
+    parser.add_argument("-m", "--mirror",
+                        help="Mirror image horizontally",
+                        action="store_true")
 
     return parser.parse_args()
 
 
 def main():
     args = _parse_args()
+    mirror = False
+    if args.mirror:
+        mirror = True
     image_file_path = validate_file_extension(args.image)
     image_file_path = validate_file_path(image_file_path)
     logger.info(image_file_path)
     ascii_key_path = args.key
     logger.info(ascii_key_path)
-    ascii_img = handle_image_conversion(image_file_path, ascii_key_path)
+    ascii_img = handle_image_conversion(image_file_path, ascii_key_path, mirror)
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)
     if args.saveimg:

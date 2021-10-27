@@ -5,10 +5,10 @@ from werkzeug.utils import redirect, secure_filename
 
 from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS, save_as_img
 
-UPLOAD_FOLDER = './webapp/uploads'
-TXT_FOLDER = './webapp'
-KEY_FOLDER = './akey.txt'
-ASCII_IMAGE_FOLDER = './webapp'
+UPLOAD_FOLDER = 'webapp/uploads/'
+TXT_FOLDER = 'webapp'
+KEY_FOLDER = 'akey.txt'
+ASCII_IMAGE_FOLDER = './'
 DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
 
 app = Flask(__name__)
@@ -18,16 +18,10 @@ app.config['TXT_FOLDER'] = TXT_FOLDER
 app.config['ASCII_IMAGE_FOLDER'] = ASCII_IMAGE_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # File max size set to 4MB
 
-def convert_image(path):
-    ascii_image = handle_image_conversion(path, KEY_FOLDER)
-    with open(app.config['TXT_FOLDER'] + '/temp.txt', 'w') as f:
-        f.write(ascii_image)
-    save_as_img(ascii_image, app.config['ASCII_IMAGE_FOLDER'] + '/temp.png')
-    return ascii_image
 
 @app.route('/')
 def get_index():
-    return render_template('index.html', image = convert_image(DEFAULT_IMAGE_PATH), filename = DEFAULT_IMAGE_PATH)
+    return render_template('index.html')
 
 
 @app.route('/generate', methods=['GET', 'POST'])
@@ -38,31 +32,43 @@ def generate():
 
         file1 = request.files['file1']
 
-        if file1 and is_supported(file1.filename):
-            path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
-            file1.save(path)
-
-            ascii_image = convert_image(path)
+        if file1 and is_supported(file1.filename): 
+            directory_path = os.path.join(app.config['UPLOAD_FOLDER'])
+            
+            #if os path exists, directly saves temp text
+            if os.path.exists(directory_path):
+                path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+                file1.save(path)
+            
+            #else, creates directory and then saves temp text
+            else:
+                os.makedirs(directory_path) 
+                path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+                file1.save(path)
+            ascii_image = handle_image_conversion(path, KEY_FOLDER)
+            with open('./webapp/temp.txt', 'w') as f:
+                f.write(ascii_image)
 
             if os.path.exists(path):
                 os.remove(path)
-
-            return render_template('index.html', image = ascii_image, filename = file1.filename)
+            return send_from_directory(app.config['TXT_FOLDER'], 'temp.txt', as_attachment=True)
 
         else:
             return f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}"
+    
 
 
-@app.route('/download_text_file', methods=['GET', 'POST'])
-def download_text_file():
+@app.route('/ztm-logo.html', methods=['GET', 'POST'])
+def show_ztm_logo_ascii_img():
+    text_image = handle_image_conversion(DEFAULT_IMAGE_PATH, KEY_FOLDER)
+    #form request
     if request.method == 'POST':
-        return send_from_directory(app.config['TXT_FOLDER'], 'temp.txt', as_attachment=True)
+        image = save_as_img(text_image, 'ztm-logo-ascii.png')
+        return send_from_directory(app.config['ASCII_IMAGE_FOLDER'], 'ztm-logo-ascii.png', as_attachment=True)
 
-
-@app.route('/download_png', methods=['GET', 'POST'])
-def download_png():
-    if request.method == 'POST':
-        return send_from_directory(app.config['ASCII_IMAGE_FOLDER'], 'temp.png', as_attachment=True)
+    if os.path.exists('ztm-logo-ascii.png'):
+        os.remove('ztm-logo-ascii.png')
+    return render_template('ztm-logo.html', image=text_image)
 
 
 if __name__ == '__main__':
