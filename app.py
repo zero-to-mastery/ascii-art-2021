@@ -1,77 +1,65 @@
 import os
 
-from flask import Flask, render_template, request, send_from_directory
-from werkzeug.utils import redirect, secure_filename
+import dotenv
+from flask import Flask, render_template, request, send_from_directory, redirect, flash, url_for
+from werkzeug.utils import secure_filename
 
-from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS, save_as_img
+from community_version import (handle_image_conversion, is_supported, save_as_img,
+                               ALLOWED_EXTENSIONS)
 
-UPLOAD_FOLDER = 'webapp/uploads/'
-TXT_FOLDER = 'webapp'
-KEY_FOLDER = 'akey.txt'
-ASCII_IMAGE_FOLDER = 'webapp'
-DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
+dotenv.load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "my-very-secret-key-pls"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['TXT_FOLDER'] = TXT_FOLDER
-app.config['ASCII_IMAGE_FOLDER'] = ASCII_IMAGE_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # File max size set to 4MB
+app.config.from_pyfile('web_config.py')
+
+config = app.config
+
+if not os.path.exists(config['UPLOAD_FOLDER']):
+    os.makedirs(config['UPLOAD_FOLDER'])
+
 
 def convert_image(path):
-    ascii_image = handle_image_conversion(path, KEY_FOLDER)
-    with open(app.config['TXT_FOLDER'] + '/temp.txt', 'w') as f:
+    ascii_image = handle_image_conversion(path, config['KEY_FOLDER'])
+    with open(config['TXT_FOLDER'] + '/temp.txt', 'w') as f:
         f.write(ascii_image)
-    save_as_img(ascii_image, app.config['ASCII_IMAGE_FOLDER'] + '/temp.png')
+    save_as_img(ascii_image, config['ASCII_IMAGE_FOLDER'] + '/temp.png')
     return ascii_image
 
+
 @app.route('/')
-def get_index():
-    return render_template('index.html', image = convert_image(DEFAULT_IMAGE_PATH), filename = DEFAULT_IMAGE_PATH)
+def index():
+    return render_template('index.html', **{
+        'image': convert_image(config['DEFAULT_IMAGE_PATH']),
+        'filename': config['DEFAULT_IMAGE_PATH'],
+    })
 
 
-@app.route('/generate', methods=['GET', 'POST'])
+@app.route('/generate', methods=['POST'])
 def generate():
-    if request.method == 'POST':
-        if ('file1' not in request.files) or (request.files['file1'].filename == ''):
-            return 'No valid file found'
+    if ('file1' not in request.files) or not request.files['file1'].filename:
+        flash('No valid file found', category='error')
+        return redirect(url_for('index'))
+    file1 = request.files['file1']
+    if file1 and is_supported(file1.filename):
+        path = os.path.join(config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+        file1.save(path)
+        ascii_image = convert_image(path)
+        if os.path.exists(path):
+            os.remove(path)
+        return render_template('index.html', image=ascii_image, filename=file1.filename)
+    else:
+        flash(f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}", category='error')
+        return redirect(url_for('index'))
 
-        file1 = request.files['file1']
 
-        if file1 and is_supported(file1.filename): 
-            directory_path = os.path.join(app.config['UPLOAD_FOLDER'])
-            
-            #if os path exists, directly saves temp text
-            if os.path.exists(directory_path):
-                path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
-                file1.save(path)
-            
-            #else, creates directory and then saves temp text
-            else:
-                os.makedirs(directory_path) 
-                path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
-                file1.save(path)
-
-            ascii_image = convert_image(path)
-
-            if os.path.exists(path):
-                os.remove(path)
-            return render_template('index.html', image = ascii_image, filename = file1.filename)
-
-        else:
-            return f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}"
-    
-
-@app.route('/download_text_file', methods=['GET', 'POST'])
+@app.route('/download_text_file', methods=['POST'])
 def download_text_file():
-    if request.method == 'POST':
-        return send_from_directory(app.config['TXT_FOLDER'], 'temp.txt', as_attachment=True)
+    return send_from_directory(config['TXT_FOLDER'], 'temp.txt', as_attachment=True)
 
 
-@app.route('/download_png', methods=['GET', 'POST'])
+@app.route('/download_png', methods=['POST'])
 def download_png():
-    if request.method == 'POST':
-        return send_from_directory(app.config['ASCII_IMAGE_FOLDER'], 'temp.png', as_attachment=True)
+    return send_from_directory(config['ASCII_IMAGE_FOLDER'], 'temp.png', as_attachment=True)
 
 
 if __name__ == '__main__':

@@ -11,6 +11,7 @@ pyfiglet = "^0.8.post1"
 Flask = "^2.0.2"
 colorama = "^0.4.4"
 termcolor = "^1.1.0"
+python-dotenv = "^0.19.1"
 
 [tool.poetry.dev-dependencies]
 
