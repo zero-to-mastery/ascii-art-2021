@@ -1,17 +1,15 @@
 import os
-import pathlib
 
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.utils import redirect, secure_filename
 
 from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS, save_as_img
 
-UPLOAD_FOLDER = './webapp/uploads'
-TXT_FOLDER = './webapp'
-KEY_FOLDER = './akey.txt'
-ASCII_IMAGE_FOLDER = './webapp'
+UPLOAD_FOLDER = 'webapp/uploads/'
+TXT_FOLDER = 'webapp'
+KEY_FOLDER = 'akey.txt'
+ASCII_IMAGE_FOLDER = 'webapp'
 DEFAULT_IMAGE_PATH = './example/ztm-logo.png'
-pathlib.Path(UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__)
 app.secret_key = "my-very-secret-key-pls"
@@ -29,7 +27,6 @@ def convert_image(path):
 
 @app.route('/')
 def get_index():
-    #text_image = handle_image_conversion(DEFAULT_IMAGE_PATH, KEY_FOLDER)
     return render_template('index.html', image = convert_image(DEFAULT_IMAGE_PATH), filename = DEFAULT_IMAGE_PATH)
 
 
@@ -37,24 +34,33 @@ def get_index():
 def generate():
     if request.method == 'POST':
         if ('file1' not in request.files) or (request.files['file1'].filename == ''):
-            return 'No valid file found' #?Put this as an error message on main page.
+            return 'No valid file found'
 
         file1 = request.files['file1']
 
-        if file1 and is_supported(file1.filename):
-            path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
-            file1.save(path)
+        if file1 and is_supported(file1.filename): 
+            directory_path = os.path.join(app.config['UPLOAD_FOLDER'])
+            
+            #if os path exists, directly saves temp text
+            if os.path.exists(directory_path):
+                path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+                file1.save(path)
+            
+            #else, creates directory and then saves temp text
+            else:
+                os.makedirs(directory_path) 
+                path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+                file1.save(path)
 
             ascii_image = convert_image(path)
 
             if os.path.exists(path):
                 os.remove(path)
-
             return render_template('index.html', image = ascii_image, filename = file1.filename)
 
         else:
             return f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}"
-
+    
 
 @app.route('/download_text_file', methods=['GET', 'POST'])
 def download_text_file():
