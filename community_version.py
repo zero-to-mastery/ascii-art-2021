@@ -54,15 +54,18 @@ def convert_to_grayscale(image):
     return image.convert('L')
 
 
-def map_pixels_to_ascii_chars(image, key, range_width=16):
+def map_pixels_to_ascii_chars(image, key):
     """Maps each pixel to an ascii char based on the range
     in which it lies.
-    0-255 is divided into 16 ranges of 16 pixels each.
+    Using the default key 'akey.txt' 0-255 is divided into 
+    16 ranges of 16 pixels each.
     """
     ascii_key = get_ascii_key(key)
+    range_width = 256/len(ascii_key)
     pixels_in_image = list(image.getdata())
+
     pixels_to_chars = [ascii_key[int(pixel_value / range_width)]
-                       for pixel_value in pixels_in_image]
+                    for pixel_value in pixels_in_image]
 
     return "".join(pixels_to_chars)
 
@@ -141,6 +144,15 @@ def validate_file_path(path):
     return path
 
 
+def validate_key_path(path):
+    logger.debug("Validating the key path")
+    if not os.path.isfile(path):
+        logger.warning(f"Invalid key file. Could not find '{path}'")
+        return "./akey.txt"
+    logger.debug("Successfully validated the key path")
+    return path
+
+
 def is_supported(path: str) -> bool:
     """
     Checks if the given path is for a supported file.
@@ -202,7 +214,7 @@ def main():
     image_file_path = validate_file_extension(args.image)
     image_file_path = validate_file_path(image_file_path)
     logger.info(image_file_path)
-    ascii_key_path = args.key
+    ascii_key_path = validate_key_path(args.key)
     logger.info(ascii_key_path)
     ascii_img = handle_image_conversion(image_file_path, ascii_key_path, mirror)
     if args.outfile:
