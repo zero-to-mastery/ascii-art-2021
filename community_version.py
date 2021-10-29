@@ -145,6 +145,15 @@ def validate_file_path(path):
     return path
 
 
+def validate_key_path(path):
+    logger.debug("Validating the key path")
+    if not os.path.isfile(path):
+        logger.warning(f"Invalid key file. Could not find '{path}'")
+        return "./akey.txt"
+    logger.debug("Successfully validated the key path")
+    return path
+
+
 def is_supported(path: str) -> bool:
     """
     Checks if the given path is for a supported file.
@@ -213,7 +222,7 @@ def main():
     image_file_path = validate_file_extension(args.image)
     image_file_path = validate_file_path(image_file_path)
     logger.info(image_file_path)
-    ascii_key_path = args.key
+    ascii_key_path = validate_key_path(args.key)
     logger.info(ascii_key_path)
     width = args.width
     logger.info(f'width={width}px')
