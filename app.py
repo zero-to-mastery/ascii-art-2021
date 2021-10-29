@@ -1,8 +1,9 @@
 import os
 import dotenv
-from flask import Flask, render_template, request, send_from_directory, redirect, url_for
+from flask import Flask, render_template, request, send_from_directory, redirect, flash, url_for
 from werkzeug.utils import secure_filename
-from community_version import handle_image_conversion, is_supported, ALLOWED_EXTENSIONS, save_as_img
+from community_version import (handle_image_conversion, is_supported, save_as_img,
+                               ALLOWED_EXTENSIONS)
 
 UPLOAD_FOLDER = './webapp/uploads'
 TXT_FOLDER = './webapp'
