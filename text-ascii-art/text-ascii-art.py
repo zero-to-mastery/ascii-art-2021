@@ -6,11 +6,13 @@
 #     -font: index of the font you want to use. Defaults to "standard" if not specified.
 #     -color: text color. Defaults to "None" if not specified.
 #     -attrs: attributes (comma-separated) used for the style. Defaults to "None" if not specified.
+#     -border: any value. Adds a border around the text.
 # Examples:
 # python text-ascii-art.py
 # python text-ascii-art.py -text "ZTM" -font 21
 # python text-ascii-art.py -text "ASCII ART" -font 16
 # python text-ascii-art.py -text "Python3" -font standard
+# python text-ascii-art.py -text "Bordered" -font standard -border 1
 # python text-ascii-art.py -text "Bold" -font standard -attrs bold,underline
 # python text-ascii-art.py -text "ZTM" -font isometric3 -color green
 # python text-ascii-art.py -text "Colorama" -font isometric3 -color red -attrs bold
@@ -87,6 +89,7 @@ parser.add_argument('-text', required=False)
 parser.add_argument('-font', required=False)
 parser.add_argument('-color', required=False)
 parser.add_argument('-attrs', required=False)
+parser.add_argument('-border', required=False)
 
 args = parser.parse_args()
 
@@ -96,8 +99,12 @@ font = getattr(args, 'font') or font_checker(fonts_list)
 
 color = getattr(args, 'color')
 attrs = (getattr(args, 'attrs'))
+border = getattr(args, 'border')
+
 if attrs is not None:
   attrs = attrs.split(',')
+
+
 
 if font not in fonts_list:
     try:
@@ -116,5 +123,29 @@ if color is not None:
     color = validate_color(color)
 if attrs is not None:
     attrs = validate_attrs(attrs)
+
+if border is not None:
+    new_fig = ""
+
+    # Get the lines in the figure
+    lines = fig.split("\n")
+
+    # Remove empty string inside the figure
+    lines.remove("")
+
+    size = len(lines[0])
+
+    # Draw a line using # signs
+    new_fig += "#" * (size + 10) + "\n"
+
+    # Surround each line with two #s
+    for line in lines:
+        new_fig += f"##   {line}   ##\n"
+
+    # Add the bottom line
+    new_fig += "#" * (size + 10) + "\n"
+
+    # Update the figure
+    fig = new_fig
 
 print(termcolor.colored(fig, color, attrs=attrs))
