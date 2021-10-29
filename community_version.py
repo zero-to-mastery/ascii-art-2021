@@ -41,12 +41,13 @@ logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
 
-def scale_image(image, new_width=100):
+def scale_image(image, new_width, font_aspect_ratio=0.542):
     """Resizes an image preserving the aspect ratio.
+        Default font aspect ratio is 'System' font.
     """
     (original_width, original_height) = image.size
     aspect_ratio = original_height / float(original_width)
-    new_height = int(aspect_ratio * new_width)
+    new_height = int(aspect_ratio * new_width * font_aspect_ratio)
     return image.resize((new_width, new_height))
 
 
@@ -70,9 +71,9 @@ def map_pixels_to_ascii_chars(image, key):
     return "".join(pixels_to_chars)
 
 
-def convert_image_to_ascii(image, key, new_width=100):
+def convert_image_to_ascii(image, key, new_width):
     logger.debug("Converting the image to ascii")
-    image = scale_image(image)
+    image = scale_image(image, new_width)
     image = convert_to_grayscale(image)
 
     pixels_to_chars = map_pixels_to_ascii_chars(image, key)
@@ -121,7 +122,7 @@ def save_as_img(image_txt, out_file):
         logger.info(f"Enter a valid path with a valid file extension.\nAllowed Extensions: {', '.join(ALLOWED_EXTENSIONS)}")
 
 
-def handle_image_conversion(image_file_path, key_file_path, mirror=False):
+def handle_image_conversion(image_file_path, key_file_path, width=150, mirror=False):
     try:
         image = Image.open(image_file_path)
     except Exception as err:
@@ -130,7 +131,7 @@ def handle_image_conversion(image_file_path, key_file_path, mirror=False):
     else:
         if mirror:
             image= ImageOps.mirror(image)
-        return convert_image_to_ascii(image, key_file_path)
+        return convert_image_to_ascii(image, key_file_path, width)
 
 
 def validate_file_path(path):
@@ -202,6 +203,13 @@ def _parse_args():
     parser.add_argument("-m", "--mirror",
                         help="Mirror image horizontally",
                         action="store_true")
+    parser.add_argument("-w", "--width",
+                        help="New image width in pixels (default: %(default)s). Max=300. ",
+                        type=int,
+                        choices=range(1,301),
+                        default=150,
+                        action="store",
+                        metavar='')
 
     return parser.parse_args()
 
@@ -216,7 +224,9 @@ def main():
     logger.info(image_file_path)
     ascii_key_path = validate_key_path(args.key)
     logger.info(ascii_key_path)
-    ascii_img = handle_image_conversion(image_file_path, ascii_key_path, mirror)
+    width = args.width
+    logger.info(f'width={width}px')
+    ascii_img = handle_image_conversion(image_file_path, ascii_key_path, width, mirror)
     if args.outfile:
         write_to_txtfile(ascii_img, args.outfile)
     if args.saveimg:
