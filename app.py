@@ -22,7 +22,13 @@ def convert_image(path):
     ascii_image = handle_image_conversion(path, config['KEY_FOLDER'])
     with open(config['TXT_FOLDER'] + '/temp.txt', 'w') as f:
         f.write(ascii_image)
-    save_as_img(ascii_image, config['ASCII_IMAGE_FOLDER'] + '/temp.png')
+    print(ascii_image)
+    path = config['ASCII_IMAGE_FOLDER'] + '/temp.png'
+    if os.path.exists(path):
+        os.remove(path)
+        save_as_img(ascii_image, config['ASCII_IMAGE_FOLDER'] + '/temp.png')
+    else:
+        save_as_img(ascii_image, config['ASCII_IMAGE_FOLDER'] + '/temp.png')
     return ascii_image
 
 
