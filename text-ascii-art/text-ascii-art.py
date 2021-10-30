@@ -7,12 +7,14 @@
 #     -color: text color. Defaults to "None" if not specified.
 #     -attrs: attributes (comma-separated) used for the style. Defaults to "None" if not specified.
 #     -border: any value. Adds a border around the text.
+#     -frame: any value. Adds a full-screen frame around the text.
 # Examples:
 # python text-ascii-art.py
 # python text-ascii-art.py -text "ZTM" -font 21
 # python text-ascii-art.py -text "ASCII ART" -font 16
 # python text-ascii-art.py -text "Python3" -font standard
 # python text-ascii-art.py -text "Bordered" -font standard -border 1
+# python text-ascii-art.py -text "Framed" -font standard -frame 1
 # python text-ascii-art.py -text "Bold" -font standard -attrs bold,underline
 # python text-ascii-art.py -text "ZTM" -font isometric3 -color green
 # python text-ascii-art.py -text "Colorama" -font isometric3 -color red -attrs bold
@@ -20,6 +22,7 @@
 import pyfiglet
 import argparse
 import termcolor, colorama
+import os
 
 colorama.init()
 
@@ -81,6 +84,12 @@ def validate_attrs(attrs):
     
     return attrs_valid    
 
+def clear():
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
+
 # Create the parser
 parser = argparse.ArgumentParser()
 
@@ -90,6 +99,7 @@ parser.add_argument('-font', required=False)
 parser.add_argument('-color', required=False)
 parser.add_argument('-attrs', required=False)
 parser.add_argument('-border', required=False)
+parser.add_argument('-frame', required=False)
 
 args = parser.parse_args()
 
@@ -100,6 +110,7 @@ font = getattr(args, 'font') or font_checker(fonts_list)
 color = getattr(args, 'color')
 attrs = (getattr(args, 'attrs'))
 border = getattr(args, 'border')
+frame = getattr(args, 'frame')
 
 if attrs is not None:
   attrs = attrs.split(',')
@@ -146,6 +157,39 @@ if border is not None:
     new_fig += "#" * (size + 10) + "\n"
 
     # Update the figure
+    fig = new_fig
+
+if frame is not None:
+    fig = fig.split("\n")
+    fig.remove("")
+
+    cols, rows = os.get_terminal_size()
+    figcols, figrows = len(fig[0]), len(fig)
+
+
+    hborder = "#" * cols
+
+    # Calculate padding from edges
+    top_pad = (rows-2) // 2 - (figrows // 2)
+    bottom_pad = rows - 2 - top_pad - figrows
+    left_pad = (cols - 4) // 2 - figcols // 2
+    right_pad = cols - 4 - left_pad - figcols
+
+    empty_row = "##" + " " * (cols - 4) + "##\n"
+
+    text_lines = ["##" + " " * left_pad + line + " " * right_pad + "##" for line in fig]
+    text_lines = "\n".join(text_lines)
+
+
+    # Clear the screen
+    clear()
+
+    new_fig = hborder + "\n"
+    new_fig += empty_row * top_pad
+    new_fig += text_lines + "\n"
+    new_fig += empty_row * bottom_pad
+    new_fig += hborder
+
     fig = new_fig
 
 print(termcolor.colored(fig, color, attrs=attrs))
