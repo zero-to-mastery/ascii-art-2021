@@ -18,18 +18,15 @@ if not os.path.exists(config['UPLOAD_FOLDER']):
     os.makedirs(config['UPLOAD_FOLDER'])
 
 
-def convert_image(path):
-    ascii_image = handle_image_conversion(path, config['KEY_FOLDER'])
+def convert_image(infile):
+    ascii_image = handle_image_conversion(infile, config['KEY_FOLDER'])
     with open(config['TXT_FOLDER'] + '/temp.txt', 'w') as f:
         f.write(ascii_image)
-    print(ascii_image)
-    path = config['ASCII_IMAGE_FOLDER'] + '/temp.png'
-    if os.path.exists(path):
-        os.remove(path)
-        save_as_img(ascii_image, config['ASCII_IMAGE_FOLDER'] + '/temp.png')
-    else:
-        save_as_img(ascii_image, config['ASCII_IMAGE_FOLDER'] + '/temp.png')
-    return ascii_image
+    outfile = config['ASCII_IMAGE_FOLDER'] + '/temp.png'
+    if os.path.exists(outfile):
+        os.remove(outfile)
+    save_as_img(ascii_image, outfile)
+    return outfile
 
 
 @app.route('/')
@@ -37,7 +34,7 @@ def index():
     return render_template('index.html', **{
         'image': convert_image(config['DEFAULT_IMAGE_PATH']),
         'filename': config['DEFAULT_IMAGE_PATH'],
-    })
+        })
 
 
 @app.route('/generate', methods=['POST'])
@@ -49,10 +46,10 @@ def generate():
     if file1 and is_supported(file1.filename):
         path = os.path.join(config['UPLOAD_FOLDER'], secure_filename(file1.filename))
         file1.save(path)
-        ascii_image = convert_image(path)
+        converted_image = convert_image(path)
         if os.path.exists(path):
             os.remove(path)
-        return render_template('index.html', image=ascii_image, filename=file1.filename)
+        return render_template('index.html', image=converted_image, filename=file1.filename)
     else:
         flash(f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}", category='error')
         return redirect(url_for('index'))
