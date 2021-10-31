@@ -9,7 +9,7 @@ import sys
 from community_version import handle_image_conversion, ALLOWED_EXTENSIONS
 
 # todo: Add keyfile selection through app
-KEYFILE = './akey.txt'
+KEYFILE = './keys/akey.txt'
 FILE_TYPES = [(f'{ext.upper()} Files', f'*.{ext}') for ext in ALLOWED_EXTENSIONS] + [('All Files', '*.*')]
 
 

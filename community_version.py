@@ -194,7 +194,7 @@ def _parse_args():
                         action="store")
     parser.add_argument("-k", "--key",
                         help="Key of ASCII characters to use in rendering",
-                        default="./akey.txt",
+                        default="./keys/akey.txt",
                         action="store")
     parser.add_argument("-s", "--saveimg",
                         help="Save the ASCII into an image file",
