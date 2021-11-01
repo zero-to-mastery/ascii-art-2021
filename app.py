@@ -54,7 +54,7 @@ def index():
 @app.route('/generate', methods=['POST'])
 def generate():
     if ('file1' not in request.files) or not request.files['file1'].filename:
-        flash('No valid file found', category='error')
+        flash('Please select an image file', category='error')
         return redirect(url_for('index'))
     file1 = request.files['file1']
     if file1 and is_supported(file1.filename):
@@ -65,8 +65,8 @@ def generate():
         if os.path.exists(path):
             os.remove(path)
         return render_template('index.html', image=ascii_image,
-                               filename=file1.filename, 
-                               data=get_ascii_keys(), 
+                               filename=file1.filename,
+                               data=get_ascii_keys(),
                                key=key)
     else:
         flash(f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}", category='error')
