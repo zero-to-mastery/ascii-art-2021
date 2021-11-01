@@ -31,6 +31,8 @@ import argparse
 
 ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "jfif", "tiff", "gif"]
 
+DEFAULT_KEY = "./keys/akey.txt"
+
 
 def get_ascii_key(akey_filepath):
     """Pull a specific keyfile to index for ASCII rendering
@@ -64,7 +66,7 @@ def map_pixels_to_ascii_chars(image, key):
     pixels_in_image = list(image.getdata())
 
     pixels_to_chars = [ascii_key[int(pixel_value / range_width)]
-        for pixel_value in pixels_in_image]
+                       for pixel_value in pixels_in_image]
 
     return "".join(pixels_to_chars)
 
@@ -147,7 +149,7 @@ def validate_key_path(path):
     logger.debug("Validating the key path")
     if not os.path.isfile(path):
         logger.warning(f"Invalid key file. Could not find '{path}'")
-        return "./akey.txt"
+        return DEFAULT_KEY
     logger.debug("Successfully validated the key path")
     return path
 
@@ -192,7 +194,7 @@ def _parse_args():
                         action="store")
     parser.add_argument("-k", "--key",
                         help="Key of ASCII characters to use in rendering",
-                        default="./keys/akey.txt",
+                        default=DEFAULT_KEY,
                         action="store")
     parser.add_argument("-s", "--saveimg",
                         help="Save the ASCII into an image file",
