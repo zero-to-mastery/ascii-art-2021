@@ -18,13 +18,9 @@ if not os.path.exists(config['UPLOAD_FOLDER']):
     os.makedirs(config['UPLOAD_FOLDER'])
 
 
-def get_ascii_keys(): #LIST COMPREHENSION?????????????????????????????????????????????
-    keys = list()
-    filenames = os.listdir(config['KEY_FOLDER'])
-    for f in filenames:
-        if f.endswith(".txt"):
-            keys.append({'name': f})
-            keys = sorted(keys, key=lambda k: k['name'])
+def get_ascii_keys():
+    keys = [{'name': f} for f in os.listdir(config['KEY_FOLDER']) if f.endswith(".txt")]
+    keys = sorted(keys, key=lambda k: k['name'])
     return keys
 
 
