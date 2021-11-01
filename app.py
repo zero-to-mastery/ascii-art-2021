@@ -18,11 +18,20 @@ if not os.path.exists(config['UPLOAD_FOLDER']):
     os.makedirs(config['UPLOAD_FOLDER'])
 
 
-def convert_image(path):
-    ascii_image = handle_image_conversion(path, config['KEY_FOLDER'])
+def get_ascii_keys(): #LIST COMPREHENSION?????????????????????????????????????????????
+    keys = list()
+    filenames = os.listdir(config['KEY_FOLDER'])
+    for f in filenames:
+        if f.endswith(".txt"):
+            keys.append({'name': f})
+            keys = sorted(keys, key=lambda k: k['name'])
+    return keys
+
+
+def convert_image(path, key=config['DEFAULT_KEY']):
+    ascii_image = handle_image_conversion(path, os.path.join(config['KEY_FOLDER'] + key))
     with open(config['TXT_FOLDER'] + '/temp.txt', 'w') as f:
         f.write(ascii_image)
-    print(ascii_image)
     path = config['ASCII_IMAGE_FOLDER'] + '/temp.png'
     if os.path.exists(path):
         os.remove(path)
@@ -37,7 +46,9 @@ def index():
     return render_template('index.html', **{
         'image': convert_image(config['DEFAULT_IMAGE_PATH']),
         'filename': config['DEFAULT_IMAGE_PATH'],
-    })
+        'data': get_ascii_keys(),
+        'key': config['DEFAULT_KEY']
+        })
 
 
 @app.route('/generate', methods=['POST'])
@@ -49,10 +60,14 @@ def generate():
     if file1 and is_supported(file1.filename):
         path = os.path.join(config['UPLOAD_FOLDER'], secure_filename(file1.filename))
         file1.save(path)
-        ascii_image = convert_image(path)
+        key = request.form.get('key_select')
+        ascii_image = convert_image(path, key)
         if os.path.exists(path):
             os.remove(path)
-        return render_template('index.html', image=ascii_image, filename=file1.filename)
+        return render_template('index.html', image=ascii_image,
+                               filename=file1.filename, 
+                               data=get_ascii_keys(), 
+                               key=key)
     else:
         flash(f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}", category='error')
         return redirect(url_for('index'))

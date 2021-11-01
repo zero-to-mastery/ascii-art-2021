@@ -35,7 +35,25 @@
         <form action="./generate" enctype="multipart/form-data" method="POST">
             <div class="container my-auto text-center">
                 <label for="formFile" class="form-label">Choose a file to generate ASCII ART</label>
+                <div class="input-group">
+                    <span class="input-group-addon">Please select</span>
+                </div>
                 <input class="form-control" name="file1" type="file" id="choosefile" accept="image/*">
+
+                <div class="key_select_container">
+                    <div class="col1">
+                        <label for="key_select_container"> Choose ASCII Key (optional) </label>
+                    </div>
+                    <div class="col2">
+                        <select name="key_select" id="key_select" class="selectpicker form-control">
+                                <option value="{{ key }}">{{ key }}</option>
+                                {% for o in data %}
+                                <option value="{{ o.name }}">{{ o.name }}</option>
+                                {% endfor %}
+                        </select>       
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-success m-2">Submit</button>
             </div>
         </form>
