@@ -5,3 +5,34 @@ body {
 .navbar-brand {
     font-weight: 600;
 }
+
+.key_select_container {
+    overflow: hidden;/* Makes this div contain its floats */
+}
+
+.key_select_container .col1,
+.key_select_container .col2 {
+    width: 49%;
+}
+
+.key_select_container .col1 {
+    width:  230px;
+    float: left;
+    border: 2px solid;
+    border-color: lightgrey;
+    border-radius: 5px;
+    margin: 0px;
+    padding: 5px;
+    background-color: whitesmoke;
+}
+
+.key_select_container .col2 {
+    float: left;
+    width:  200px;
+}
+
+.key_select_container label {
+    display: inline-block;
+    vertical-align:  middle;
+
+}
