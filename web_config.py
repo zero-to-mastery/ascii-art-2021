@@ -8,7 +8,7 @@ import os
 
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', 'webapp/uploads')
 TXT_FOLDER = os.environ.get('TXT_FOLDER', 'webapp')
-ASCII_IMAGE_FOLDER = os.environ.get('ASCII_IMAGE_FOLDER', 'webapp')
+ASCII_IMAGE_FOLDER = os.environ.get('ASCII_IMAGE_FOLDER', 'static')
 MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', f"{4 * 1024 * 1024}"))  # File max size set to 4MB
 KEY_FOLDER = os.environ.get('KEY_FOLDER', 'keys/')
 DEFAULT_KEY = os.environ.get('DEFAULT_KEY', 'akey.txt')

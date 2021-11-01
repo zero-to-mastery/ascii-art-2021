@@ -24,17 +24,15 @@ def get_ascii_keys():
     return keys
 
 
-def convert_image(path, key=config['DEFAULT_KEY']):
-    ascii_image = handle_image_conversion(path, os.path.join(config['KEY_FOLDER'] + key))
+def convert_image(infile, key=config['DEFAULT_KEY']):
+    ascii_image = handle_image_conversion(infile, os.path.join(config['KEY_FOLDER'] + key))
     with open(config['TXT_FOLDER'] + '/temp.txt', 'w') as f:
         f.write(ascii_image)
-    path = config['ASCII_IMAGE_FOLDER'] + '/temp.png'
-    if os.path.exists(path):
-        os.remove(path)
-        save_as_img(ascii_image, config['ASCII_IMAGE_FOLDER'] + '/temp.png')
-    else:
-        save_as_img(ascii_image, config['ASCII_IMAGE_FOLDER'] + '/temp.png')
-    return ascii_image
+    outfile = config['ASCII_IMAGE_FOLDER'] + '/temp.png'
+    if os.path.exists(outfile):
+        os.remove(outfile)
+    save_as_img(ascii_image, outfile)
+    return outfile
 
 
 @app.route('/')
@@ -56,14 +54,16 @@ def generate():
     if file1 and is_supported(file1.filename):
         path = os.path.join(config['UPLOAD_FOLDER'], secure_filename(file1.filename))
         file1.save(path)
+
         key = request.form.get('key_select')
-        ascii_image = convert_image(path, key)
+        converted_image = convert_image(path, key)
         if os.path.exists(path):
             os.remove(path)
-        return render_template('index.html', image=ascii_image,
+        return render_template('index.html', image=converted_image,
                                filename=file1.filename,
                                data=get_ascii_keys(),
                                key=key)
+
     else:
         flash(f"File must be one of: {', '.join(ALLOWED_EXTENSIONS)}", category='error')
         return redirect(url_for('index'))
